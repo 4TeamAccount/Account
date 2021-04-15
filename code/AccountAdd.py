@@ -3,6 +3,7 @@ import pandas as pd # [Ctrl+Alt+S] > Project Interpreter > + > pandas
 
 ACCOUNT_PATH = "C:/Users/thekoo/Desktop/394028.txt"
 
+tags = dict()
 main_tag = []
 sub_tag = []
 
@@ -72,9 +73,14 @@ class ChangeBuilder:
             else:
                 input_tag = t # 정상 결과:[하위태그]
                 print("정상 입력 태그: {}" .format(t)) #확인용! 나중에 지우기
-                #input_money, *input_date = map(str, input("AccountNumber > [{0}][{1}] > 내역 > " .format(main_tag[i[0]-1], sub_tag[i[0]-1][i[1]-1])).split())
-                        
-                    
+                
+                m = ''
+                for key, value in tags.items():
+                    if t in value:
+                        m = key
+                        break
+                input_money, *input_date = map(str, input("AccountNumber > [{0}][{1}] > 내역 > " .format(m, t)))
+                                           
 
     def buildMoney(money):
         return
@@ -132,7 +138,7 @@ if __name__ == '__main__':
     main_tag = list(tags.keys())
     sub_tag = list(tags.values())
     
-    tag_input = '1.2'
+    tag_input = '[책]'
     ch.buildTag(tag_input)
     
     #ac.addChange(1234, 'a', 'b')
