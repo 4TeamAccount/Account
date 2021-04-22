@@ -174,6 +174,7 @@ class Account:
             new_tag += " "
         new_tag = new_tag[:-1]
         new_tag += '\n'
+
         for line in fileinput.input(self.account_file, inplace=True):
             if '(' in line and '/' in line and ')' in line:
                 line = line.replace(line, new_tag)
@@ -230,6 +231,7 @@ class Account:
             new_tag += " "
         new_tag = new_tag[:-1]
         new_tag += '\n'
+
         for line in fileinput.input(self.account_file, inplace=True):
             if '(' in line and '/' in line and ')' in line:
                 line = line.replace(line, new_tag)
