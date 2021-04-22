@@ -123,7 +123,8 @@ class Account:
             super_num = int(tag_num)
             if super_num <= len(dict):
                 print(".!!오류 : 해당 위치에 태그가 이미 존재 합니다.")
-                self.addTag(self, dict)
+                self.addTag(dict)
+                return 0
         temp = 1
         for key in dict.keys():
             if dict[key] == ['']:
@@ -132,20 +133,23 @@ class Account:
                 if len(dict[key]) >= child_num:
                     print(child_num, len(dict[key]), dict[key])
                     print(".!!오류 : 해당 위치에 태그가 이미 존재 합니다.")
-                    self.addTag(self, dict)
+                    self.addTag(dict)
+                    return 0
             if tag_name == key:
                 print(".!!오류 : 해당 이름의 태그가 이미 존재 합니다.")
-                self.addTag(self, dict)
-                break
+                self.addTag(dict)
+                return 0
+
             for val in dict[key]:
                 if tag_name == val:
                     print(".!!오류 : 해당 이름의 태그가 이미 존재 합니다.")
-                    self.addTag(self, dict)
-                    break
+                    self.addTag(dict)
+                    return 0
             temp += 1
         if ' ' in tag_name or '\t' in tag_name:
             print(".!!오류 : 태그 이름에는 탭이나 개행 문자가 포함될 수 없습니다.")
-            self.addTag(self, dict)
+            self.addTag(dict)
+            return 0
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
         print(super_num, child_num)
         if child_num != 0:
@@ -174,7 +178,79 @@ class Account:
             new_tag += " "
         new_tag = new_tag[:-1]
         new_tag += '\n'
+        for line in fileinput.input(self.account_file, inplace=True):
+            if '(' in line and '/' in line and ')' in line:
+                line = line.replace(line, new_tag)
+            sys.stdout.write(line)
+        print(new_tag)
 
+    def editTag(self, dict):
+        print("태그를 수정 할 위치와 태그 이름을 입력하세요")
+        tag_num, tag_name = input().replace(']', '').split('[')
+        child_num = 0
+        if '.' in tag_num:
+            super_num, child_num = map(int, tag_num.split('.'))
+        else:
+            super_num = int(tag_num)
+            if super_num > len(dict):
+                print(".!!오류 : 해당 위치에 태그가 존재하지 않습니다.")
+                self.editTag(dict)
+                return 0
+        temp = 1
+        for key in dict.keys():
+            if dict[key] == ['']:
+                dict[key] = []
+            if temp == super_num:
+                if len(dict[key]) < child_num:
+                    print(child_num, len(dict[key]), dict[key])
+                    print(".!!오류 : 해당 위치에 태그가 존재하지 않습니다.")
+                    self.editTag(dict)
+                    return 0
+            if tag_name == key:
+                print(".!!오류 : 해당 이름의 태그가 이미 존재 합니다.")
+                self.editTag(dict)
+                return 0
+                break
+            for val in dict[key]:
+                if tag_name == val:
+                    print(".!!오류 : 해당 이름의 태그가 이미 존재 합니다.")
+                    self.editTag(dict)
+                    return 0
+                    break
+            temp += 1
+        if ' ' in tag_name or '\t' in tag_name:
+            print(".!!오류 : 태그 이름에는 탭이나 개행 문자가 포함될 수 없습니다.")
+            self.editTag(dict)
+            return 0
+        # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
+        if child_num != 0:
+            dict[list(dict.keys())[super_num-1]][child_num-1] = tag_name
+            new_dict = dict.copy()
+        else:
+            new_dict = {}
+            new_keys = list(dict.keys())
+            new_keys[super_num-1] = tag_name
+            temp = 0
+            for keys in new_keys:
+                new_dict[keys] = dict[list(dict.keys())[temp]]
+                temp += 1
+        print(new_dict)
+        new_tag = ""
+
+        for key in new_dict.keys():
+            new_tag += key + '('
+            temp = 1
+            if len(new_dict[key]) == 0:
+                new_tag += ')'
+            for val in new_dict[key]:
+                if temp == len(new_dict[key]):
+                    new_tag += val + ')'
+                else:
+                    new_tag += val + '/'
+                temp += 1
+            new_tag += " "
+        new_tag = new_tag[:-1]
+        new_tag += '\n'
         for line in fileinput.input(self.account_file, inplace=True):
             if '(' in line and '/' in line and ')' in line:
                 line = line.replace(line, new_tag)
@@ -189,10 +265,12 @@ class Account:
             if ord(c) < 48 and ord(c) >57 and ord(c) != 46:
                 print(".!!오류 : 태그 위치에는 숫자와 . 만 입력 가능합니다.")
                 self.deleteTag(dict)
+                return 0
 
         if tag_num.count('.') > 1:
             print(".!!오류 : 태그 위치에는 숫자와 하나의 . 만 입력 가능합니다.")
             self.deleteTag(dict)
+            return 0
 
         child_num = 0
         if '.' in tag_num:
@@ -202,6 +280,7 @@ class Account:
             if super_num > len(dict):
                 print(".!!오류 : 해당 위치에 태그가 존재하지 않습니다.")
                 self.deleteTag(dict)
+                return 0
         #하위태그는 입력 안했을때
         if child_num == 0:
             #삭제하려는 태그의 하위태그가 존재할때
@@ -209,11 +288,17 @@ class Account:
             if len(dict[list(dict.keys())[super_num-1]]) != 0:
                 print(".!!오류 : 해당 위치에 태그에 하위 태그들이 존재하면 삭제 할 수 없습니다.")
                 self.deleteTag(dict)
+                return 0
             else:
                 del dict[list(dict.keys())[super_num-1]]
         #하위태그 삭제할때
         else:
-            del dict[list(dict.keys())[super_num-1]][child_num-1]
+            if child_num > len(dict[list(dict.keys())[super_num-1]]):
+                print(".!!오류 : 해당 위치에 태그가 존재하지 않습니다.")
+                self.deleteTag(dict)
+                return 0
+            else:
+                del dict[list(dict.keys())[super_num-1]][child_num-1]
 
         new_tag = ""
 
@@ -231,7 +316,6 @@ class Account:
             new_tag += " "
         new_tag = new_tag[:-1]
         new_tag += '\n'
-
         for line in fileinput.input(self.account_file, inplace=True):
             if '(' in line and '/' in line and ')' in line:
                 line = line.replace(line, new_tag)
@@ -253,12 +337,15 @@ class Account:
 
 
 
+
+
 if __name__ == "__main__":
 
     a = Account()
     CLIController.printAllTag(a.getAllTag('394028'))
     # a.addTag(a.getAllTag('394028'))
-    a.deleteTag(a.getAllTag('394028'))
+    # a.deleteTag(a.getAllTag('394028'))
+    a.editTag(a.getAllTag('394028'))
     # while True:
     #     #1.무결성 검사 후 실패시 리턴
     #     select_sign=CLIController.login_menu()
