@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 import fileinput
 import sys
 
@@ -115,32 +116,70 @@ class ChangeBuilder:
         return
 
     def setDate(self, date):
+        d = date
+        num = re.findall("\d+", d)
+        
+        if any(map(lambda x: len(x) < 2, num)):
+            print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
+            return 'e'
+        
+        num = list(map(int, num))
+        check = ['-', '/', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        print(num)
+        
+        for k in d:
+            flag = False
+            for ch in check:
+                if ch in k:
+                    flag = True
+            if flag == False:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                return 'e'
+        
         today = datetime.now()
-        d = datetime(2012, 12, 3)
-        if d > today:
-            print("미래 시점 확인")
-        return
+        if 1970 > num[0] or num[0] > 2037:
+            print(".!! 오류: 연도가 1970년 이후부터 2037년 이전까지여야 합니다.")
+            return 'e'
+        
+        try: 
+            day = datetime(num[0], num[1], num[2])
+            if day > today:
+                print(".!! 오류: 미래의 내역은 작성할 수 없습니다.")
+                return 'e'
+        except:
+            print(".!! 오류: 해당 날짜가 현행 그레고리력에 존재하는 날짜여야 합니다.")
+            return 'e'
+            
 
     def build():
         return
     
     def addChange(self, account_num, money, *date):
+        print("들어온 금액 인자", money)
+        print("들어온 날짜 인자", date)
+        
         #f = open(ACCOUNT_PATH, "r+", encoding= 'utf-8')
         file_name = account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r', encoding='UTF-8')
         lines = f.readlines()
-        print(lines[-1].split(' ')[1])
-       
-        """
+        total = lines[-1].split(' ')[1]
+    
+        
         if money:
+            m = money
+            
             self.setMoney(money)
-        """
+        
         
         if date:
             d = date[0]
-            print(date[0])
-            self.setDate(d)
+            #print(date[0])
+            if self.setDate(d) == 'e':
+                return
+            else:
+                self.input_date = d
     
         """
         print(len(f.readlines()))
@@ -203,8 +242,14 @@ if __name__ == '__main__':
         else:
             at = ch.setTag(t[0])
             if type(at) == list:
-                ch.input_money, *ch.input_date = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split())
-                ch.addChange('394028', ch.input_money, *ch.input_date)
+                try:
+                    input_m, *input_d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split())
+                    if len(input_d) >= 2:
+                        print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
+                    else:
+                        ch.addChange('394028', input_m, *input_d)
+                except ValueError:
+                    print("길이가 1이하 입니다!")
             elif type(at) == str:
                 m = ''
                 for key, value in tags.items():
