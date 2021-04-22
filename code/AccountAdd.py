@@ -38,6 +38,7 @@ class ChangeBuilder:
     input_tag = ''
     input_money = ''
     input_date = ''
+    total = ''
     
     
     def setTag(self, tag): #tag가 [태그] or x.x로 들어옴
@@ -112,20 +113,63 @@ class ChangeBuilder:
 
 
     def setMoney(self, money):
+        mo = money
         
-        return
+        digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        head = ['-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        mids = [',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        tail  = ['원', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        
+        
+        if len(mo) == 1 and not mo[0] in digits:
+            #print("문자열 길이가 1이라면 그 문자는 무조건 숫자여야 함")
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            return 'e'
+        elif len(mo) == 1:
+            return mo
+        
+        if not mo[0] in head:
+            #print("숫자 맨 앞은 숫자랑 + -로만 가능")
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            return 'e'
+        
+        for k in mo[1:-1]:
+            flag = False
+            for mid in mids:
+                if mid in k:
+                    flag = True
+                
+            if flag == False:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+                return 'e'
+    
+        if not mo[-1] in tail:
+            #print("숫자 끝은 원이랑 숫자만 가능")
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            return 'e'
+        
+        if mo[0] == '-' and int(self.total) < int(mo[1:]):
+                print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                return 'e'
+    
+        return mo
 
     def setDate(self, date):
         d = date
         num = re.findall("\d+", d)
         
-        if any(map(lambda x: len(x) < 2, num)):
+        if len(num) != 3 or any(map(lambda x: len(x) < 2, num)):
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
             return 'e'
         
         num = list(map(int, num))
         check = ['-', '/', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        print(num)
+        #print(num)
         
         for k in d:
             flag = False
@@ -139,40 +183,121 @@ class ChangeBuilder:
         
         today = datetime.now()
         if 1970 > num[0] or num[0] > 2037:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 연도가 1970년 이후부터 2037년 이전까지여야 합니다.")
             return 'e'
         
         try: 
             day = datetime(num[0], num[1], num[2])
             if day > today:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 미래의 내역은 작성할 수 없습니다.")
                 return 'e'
         except:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 해당 날짜가 현행 그레고리력에 존재하는 날짜여야 합니다.")
             return 'e'
             
 
-    def build():
-        return
-    
-    def addChange(self, account_num, money, *date):
-        print("들어온 금액 인자", money)
-        print("들어온 날짜 인자", date)
+    def build(self, save_tag, money, *date):
+        save_date = date[0]
         
-        #f = open(ACCOUNT_PATH, "r+", encoding= 'utf-8')
+        if '원' not in money[-1]:
+            money = money +'원' 
+            
+        if save_date == []:
+            save_date = datetime.now()
+        else:
+            save_date = save_date[0].replace('-', '.').replace('/', '.')
+        
+        print(f"입력 내용: {save_tag} {money} {save_date}")
+        
+        self.input_tag = save_tag
+        self.input_money = money
+        self.input_date = date
+    
+    def addChange(self, account_num, atag):
+        #print("들어온 금액 인자", money)
+        #print("들어온 날짜 인자", date)
+        t = ''
+        m = ''
+        d = ''
+        
         file_name = account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r', encoding='UTF-8')
         lines = f.readlines()
-        total = lines[-1].split(' ')[1]
-    
+        self.total = lines[-1].split(' ')[3]
         
-        if money:
-            m = money
+        if type(atag) == list:
+                try:
+                    m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split( ))
+                    t = f"[{main_tag[at[0]-1]}][{sub_tag[at[0]-1][at[1]-1]}]"
+                    
+                except ValueError:
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                    print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+                    self.addChange(account_num, atag)
+        elif type(atag) == str:
+            main_key = ''
+            for key, value in tags.items():
+                if at in value:
+                    main_key = key
+                    break
+            try:    
+                m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_key, at)).split( ))
+                t = f"[{main_key}][{at}]"
+                
+            except ValueError:
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                    print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+        
+        if len(d) >= 2:
+            print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
+            self.addChange(account_num, atag)
+        else:
+            m_res = self.setMoney(m)
             
-            self.setMoney(money)
+            if m_res == 'e':
+                if d:
+                    for k in d:
+                        for c in [',', '원']:
+                            if c in k:
+                                print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+
+                self.addChange(account_num, atag)
+            elif d:
+                d_res = self.setDate(d[0])
+                if d_res != 'e':
+                    
+                    self.build(t, m, d)
+                else:
+                    self.addChange(account_num, atag)
+            else:
+                self.build(t, m, d)
+            #ch.addChange('394028', ch.input_money, *ch.input_date)
+
+
         
-        
+    
+        #d = date[0]
+
+        """
+        if m:
+            m_res = self.setMoney(m)
+            if m_res != 'e' and d:
+                #print(date[0])
+                if self.setDate(d) == 'e':
+                    self.addChange(account_num, atag)
+                else:
+                    self.input_date = d
+                    
+            elif any(map(lambda x: x in d, [',', '원'])):
+                print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+           """     
+                
+                
+        """
         if date:
             d = date[0]
             #print(date[0])
@@ -180,19 +305,7 @@ class ChangeBuilder:
                 return
             else:
                 self.input_date = d
-    
-        """
-        print(len(f.readlines()))
-        f.seek(0)
-        n = 0
-        for line in f.readlines():
-            if '20' in line:
-                n += 1
-                print("line num: {}" .format(n))
-                print("content: {}".format(line))
-            else:
-                n+=1
-"""
+    """
         print("입력/지출")
         
         f.close()
@@ -231,7 +344,8 @@ if __name__ == '__main__':
     sub_tag = list(tags.values())
 
     
-    
+    #print(ch.setMoney('1000원'))
+
     #기획서 상 메인 출력
     c, *t = input("AccountNumber > ").split()
     if c == 'add':
@@ -241,6 +355,9 @@ if __name__ == '__main__':
             CLIController.printAllTag(ac.getAllTag('394028'))
         else:
             at = ch.setTag(t[0])
+            if at != None:
+                ch.addChange('394028', at)
+            """
             if type(at) == list:
                 try:
                     input_m, *input_d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split())
@@ -258,11 +375,10 @@ if __name__ == '__main__':
                         break
                 ch.input_money, *ch.input_date = map(str, input("AccountNumber > [{0}]{1} 내역> " .format(m, t[0])).split())
                 ch.addChange('394028', ch.input_money, *ch.input_date)
-
+                """
         #print(type(ch.setTag(t)))
         #if ch.setTag(t)[0] == 't':
 
-        
     
     #ac.addChange(1234, 'a', 'b')
     
