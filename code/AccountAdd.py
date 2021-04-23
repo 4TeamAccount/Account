@@ -1,4 +1,5 @@
 from datetime import datetime
+import datetime
 import re
 import fileinput
 import sys
@@ -161,15 +162,38 @@ class ChangeBuilder:
     def setDate(self, date):
         d = date
         num = re.findall("\d+", d)
+        #num = "".join(num) #문자열 하나로 합침
         
-        if len(num) != 3 or any(map(lambda x: len(x) < 2, num)):
+        print(f"기존 숫자 {d} 변환 숫자{num}")
+        if len(num) == 1:#20210102 경우
+            num = "".join(num)
+            if len(num) != 8:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
+                return 'e'
+            else:
+                tmp = [num[:4], num[4:6], num[6:]]
+                num = tmp
+                
+        elif len(num) == 3:
+            if len(num[0]) != 4:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 연도는 4자리로 입력해야 합니다.")
+                return 'e'
+            print(num[1:])
+            if any(map(lambda x: len(x) != 2, num[1:])):
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
+                return 'e'
+        else:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
-            print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
+            print(".!! 오류: 연도는 4자리, 월과 일은 2자리로 입력해야 합니다.")
             return 'e'
         
         num = list(map(int, num))
         check = ['-', '/', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         #print(num)
+        
         
         for k in d:
             flag = False
@@ -181,14 +205,14 @@ class ChangeBuilder:
                 print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
                 return 'e'
         
-        today = datetime.now()
+        today = datetime.date.today()
         if 1970 > num[0] or num[0] > 2037:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 연도가 1970년 이후부터 2037년 이전까지여야 합니다.")
             return 'e'
         
         try: 
-            day = datetime(num[0], num[1], num[2])
+            day = datetime.date(num[0], num[1], num[2])
             if day > today:
                 print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 미래의 내역은 작성할 수 없습니다.")
@@ -199,22 +223,42 @@ class ChangeBuilder:
             return 'e'
             
 
-    def build(self, save_tag, money, *date):
+    def build(self, account_num, save_tag, money, *date):
         save_date = date[0]
+        print(save_date)
+        print(len(save_date))
         
         if '원' not in money[-1]:
             money = money +'원' 
             
-        if save_date == []:
-            save_date = datetime.now()
+        if len(save_date) == 0:
+            save_date = datetime.date.today()
+            save_date = save_date.strftime("%Y.%m.%d")
+            print(f"입력 내용: {save_tag} {money} {save_date} (오늘)")
         else:
             save_date = save_date[0].replace('-', '.').replace('/', '.')
+            print(f"입력 내용: {save_tag} {money} {save_date}")
         
-        print(f"입력 내용: {save_tag} {money} {save_date}")
+        save_check = input("AccountNumber> 정말 저장하시겠습니까? (.../No) >")
         
-        self.input_tag = save_tag
-        self.input_money = money
-        self.input_date = date
+        if save_check == "No":
+            return 'back'
+        else:
+            self.input_tag = save_tag
+            self.input_money = money
+            self.input_date = date
+            
+            file_name = account_num + ".txt"
+            self.account_file = file_name
+            f = open(file_name, 'r', encoding='UTF-8')
+            lines = f.readlines()
+            
+            """
+            리스트[3:]에서부터 정
+            """
+            print(lines)
+            
+            
     
     def addChange(self, account_num, atag):
         #print("들어온 금액 인자", money)
@@ -264,17 +308,23 @@ class ChangeBuilder:
                         for c in [',', '원']:
                             if c in k:
                                 print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
-
+        
                 self.addChange(account_num, atag)
             elif d:
                 d_res = self.setDate(d[0])
                 if d_res != 'e':
-                    
-                    self.build(t, m, d)
+                    save_res = self.build(account_num, t, m, d)
+                    if save_res == 'back':
+                        print("주 프롬프트 출력해야함!")
+                        return
                 else:
                     self.addChange(account_num, atag)
+                   
             else:
-                self.build(t, m, d)
+                save_res = self.build(account_num, t, m, d)
+                if save_res == 'back':
+                    print("주 프롬프트 출력해야함!")
+                    return
             #ch.addChange('394028', ch.input_money, *ch.input_date)
 
 
