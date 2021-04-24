@@ -3,6 +3,12 @@ import sys
 import random
 import datetime
 
+"""
+<2021-04-24 15:55 수정>
+1. 파일 인코딩 ANSI로 바꾸기
+2. 계좌 파일에 회원 기록 구분자 탭으로 바꾸기
+
+"""
 
 class AccountFactory:
      
@@ -18,7 +24,7 @@ class AccountFactory:
      def IDsearch(self):
           info = []
           find_index = -1
-          with open(AccountFactory.user_file, 'r', encoding='UTF-8') as file:
+          with open(AccountFactory.user_file, 'r', encoding='ANSI') as file:
                info = file.readlines()
                for index, user_account in enumerate(info):
                # ID를 담고있는 행에서만 검색
@@ -44,7 +50,7 @@ class AccountFactory:
                     account_file = self.account_folder + f"\\{account_num}.txt"
                     # 계좌 파일이 존재할 경우
                     if os.path.isfile(account_file):
-                         with open(account_file, mode='r', encoding='UTF-8') as f:
+                         with open(account_file, mode='r', encoding='ANSI') as f:
                               for line in f:
                                    pass
                               # 각 파일의 잔고만 읽어오기(파일의 마지막 행)
@@ -73,7 +79,7 @@ class AccountFactory:
           
           # 회원 ID를 찾았을 경우
           if not find_index == -1:
-               with open(AccountFactory.user_file, 'w', encoding='UTF-8') as file:
+               with open(AccountFactory.user_file, 'w', encoding='ANSI') as file:
                     
                     # 계좌번호 생성 과정
                     account_num_list = []
@@ -95,7 +101,7 @@ class AccountFactory:
                     file.writelines(info)
 
                     # 계좌 파일 생성
-                    f = open(AccountFactory.account_folder + f"\\{new_account_num}.txt", 'w', encoding='utf-8')
+                    f = open(AccountFactory.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                     name = info[find_index-1].split('\t')[0]
                     f.write(f"1{name}({self.ID})" +"\n\n")
                     f.write("태그" + "\n\n")
@@ -132,14 +138,14 @@ class AccountFactory:
                     answer = input("해당 계좌에 권한을 요청할까요?(y/n) : ")
                     if answer == 'y':
                          # 해당 계좌 파일에 권한 요청을 기록
-                         with open(account_file, 'r', encoding='UTF-8') as file:
+                         with open(account_file, 'r', encoding='ANSI') as file:
                               # 회원 이름도 같이 기록하기 위해 불러오기
                               info, find_index = self.IDsearch()
                               name = info[find_index-1].split('\t')[0]
 
                               # 계좌의 권한 현황을 불러온다
                               account_data = file.readlines()
-                              permission_list = account_data[0].rstrip().split(' ')
+                              permission_list = account_data[0].rstrip().split('\t')
                               new_request = f"{name}({self.ID})"
 
                               # "이름(아이디)"가 동일한 정보가 있다면
@@ -148,9 +154,9 @@ class AccountFactory:
                                         print("이미 권한 요청을 했거나 사용 가능한 계좌입니다.")
                                         return
 
-                              account_data[0] = account_data[0].rstrip() + f" 4{new_request}\n"
+                              account_data[0] = account_data[0].rstrip() + f"\t4{new_request}\n"
                               
-                         with open(account_file, 'w', encoding='UTF-8') as file:
+                         with open(account_file, 'w', encoding='ANSI') as file:
                              file.writelines(account_data)
                          return
                     elif answer == 'n':

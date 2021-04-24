@@ -14,9 +14,13 @@ import datetime
 4. ID 문법 규칙 수정 O
 
 <수정 사항>
-마지막 수장 : 2021-04-24 01:40 am
+마지막 수정 : 2021-04-24 01:40 am
 1. 주민등록번호 의미규칙(중복 처리) 반영
 2. open()하면 close() 명확히 처리
+
+<수정 사항>
+마지막 수정: 2021-04-24 15:56 pm
+1. 파일 인코딩 ANSI로 바꾸기
 
 """
 
@@ -55,7 +59,7 @@ class UserManager:
                                                         or re.fullmatch(UserManager.ID_match4, ID) or re.fullmatch(UserManager.ID_match5, ID)
                                                         or re.fullmatch(UserManager.ID_match6, ID) or re.fullmatch(UserManager.ID_match7, ID)) and ID[0] not in ['-', '_']:
                     # 문법 규칙 맞았을 경우, 해당 아이디가 유효한지 확인
-                    file = open(UserManager.user_file, 'r', encoding = 'UTF-8')
+                    file = open(UserManager.user_file, 'r', encoding = 'ANSI')
                     info = file.readlines()
                     file.close()
                     find_index = -1
@@ -206,7 +210,7 @@ class UserManager:
                
 
                # 회원 관리 파일 해당 회원 찾기
-               file = open(UserManager.user_file, 'r', encoding = 'UTF-8')
+               file = open(UserManager.user_file, 'r', encoding = 'ANSI')
                info = file.readlines()
                file.close()
                find_index = -1
@@ -378,13 +382,13 @@ class UserManager:
                          new_account_num = random.randint(100000, 999999)
 
                     ######## 계좌파일 만들기 + 회원정보파일에 해당 회원 정보/계정/계좌번호 기록 ########
-                    f = open(UserManager.user_file, 'a', encoding='UTF-8')
+                    f = open(UserManager.user_file, 'a', encoding='ANSI')
                     f.write(name + "\t" + iden_num + "\n")
                     f.write(ID + " " + PW + "\n")
                     f.write(str(new_account_num) +"\n\n")
                     f.close()
                     
-                    f = open(UserManager.account_folder + f"\\{new_account_num}.txt", 'w', encoding='utf-8')
+                    f = open(UserManager.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                     f.write(f"1{name}({ID})" +"\n\n")
                     f.write("태그" + "\n\n")
                     now = datetime.datetime.now().strftime('%Y-%m-%d')
