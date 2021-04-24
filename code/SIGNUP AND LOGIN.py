@@ -1,4 +1,3 @@
-#import FILEMANAGE
 import os.path
 import sys
 import re
@@ -21,6 +20,10 @@ import datetime
 <수정 사항>
 마지막 수정: 2021-04-24 15:56 pm
 1. 파일 인코딩 ANSI로 바꾸기
+
+<수정 사항>
+마지막 수정 : 2021-04-24 18:06 pm
+1. 디폴트 태그 반영해서 계좌 파일 생성하기
 
 """
 
@@ -390,10 +393,11 @@ class UserManager:
                     
                     f = open(UserManager.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                     f.write(f"1{name}({ID})" +"\n\n")
-                    f.write("태그" + "\n\n")
+                    f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                     now = datetime.datetime.now().strftime('%Y.%m.%d')
                     f.write(f"[계좌 생성] +{balance} {now} {balance}")
                     f.close()
+                    ######## 생성된 계좌 파일 무결성 확인 ########
                     return
 
                          

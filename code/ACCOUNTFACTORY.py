@@ -8,6 +8,11 @@ import datetime
 1. 파일 인코딩 ANSI로 바꾸기
 2. 계좌 파일에 회원 기록 구분자 탭으로 바꾸기
 
+<2021-04-24 18:06 수정>
+1. 디폴트 태그 반영해서 계좌 파일 생성하기
+2. 계좌 선택시 자기 계좌 아니면 접근 못하게 하기
+3. 계좌 목록 출력시, 파일이 없는 계좌 발견하면 출력하지 말고 함수 종료하기.
+
 """
 
 class AccountFactory:
@@ -43,8 +48,7 @@ class AccountFactory:
           info, find_index = self.IDsearch()
           if not find_index == -1:
                account_list = info[find_index+1][0:-1].split(' ')
-               print("============계좌 목록 출력============")
-               print(f"{'계좌번호':<10} 잔고")
+               account_print_list = []
                # 이 회원이 사용할 수 있는 계좌들이 실제 파일로 있는지 확인
                for account_num in account_list:
                     account_file = self.account_folder + f"\\{account_num}.txt"
@@ -54,11 +58,17 @@ class AccountFactory:
                               for line in f:
                                    pass
                               # 각 파일의 잔고만 읽어오기(파일의 마지막 행)
-                              balance = line.split(' ')[-1]
-                         print(f"{account_num:<15}{balance:<}")
-                    # 계좌 파일이 없을 경우 잔고 표시 방법
+                              account_print_list += [f"{account_num:<15}{line.split(' ')[-1]:<}"]
+                    # 계좌 파일이 없을 경우 함수 반환
                     else:
-                         print(f"{account_num:<15}{'-':<}")
+                         print("파일이 존재하지 않는 계좌가 발견되었습니다") 
+                         return
+                    
+               # 여기까지 왔으면 모든 계좌를 출력가능
+               print("============계좌 목록 출력============")
+               print(f"{'계좌번호':<10} 잔고")
+               for account in account_print_list:
+                    print(account)
 
 
      def createAccount(self):
@@ -104,7 +114,7 @@ class AccountFactory:
                     f = open(AccountFactory.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                     name = info[find_index-1].split('\t')[0]
                     f.write(f"1{name}({self.ID})" +"\n\n")
-                    f.write("태그" + "\n\n")
+                    f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                     now = datetime.datetime.now().strftime('%Y.%m.%d')
                     
                     f.write(f"[계좌 생성] +{balance} {now} {balance}")
@@ -115,16 +125,31 @@ class AccountFactory:
 
      def selectAccount(self):
           select_account = input("선택할 계좌의 계좌번호를 입력해주세요 : ")
-          # 선택할 계좌가 실제로 있는지 확인
-          account_file = self.account_folder + f"\\{select_account}.txt"
-          # 그러한 계좌 파일이 있을 경우
-          if os.path.isfile(account_file):
-               # 여기서 계좌 파일 무결성 검사 클래스의 메소드를 호출해야 할 것 같습니다.
-               # 무결성 검사 시 중대오류가 발견되지 않는다면, 회원의 권한에 따라 메뉴를 출력해주는데 그것은 이 클래스의 역할이 아닌 것 같습니다.
-               # 예를들어 무결성 검사 결과를 True/False로 반환하는 식으로 이해했습니다.
-               pass
+          # 선택한 계좌가 회원이 접근가능한 한지를 검사
+          info, find_index = self.IDsearch()
+          accessible_account_list = info[find_index+1].rstrip().split(' ')
+          that_is_my_account = False
+          for account in accessible_account_list:
+               if select_account == account:
+                    that_is_my_account = True
+                    break
+
+          # 선택한 계좌가 회원의 계좌 목록에 실제로 있는 경우
+          if that_is_my_account == True:                  
+               # 선택한 계좌가 실제로 있는지 확인
+               account_file = self.account_folder + f"\\{select_account}.txt"
+               # 그러한 계좌 파일이 있을 경우
+               if os.path.isfile(account_file):
+                    # 여기서 계좌 파일 무결성 검사 클래스의 메소드를 호출해야 할 것 같습니다.
+                    # 무결성 검사 시 중대오류가 발견되지 않는다면, 회원의 권한에 따라 메뉴를 출력해주는데 그것은 이 클래스의 역할이 아닌 것 같습니다.
+                    # 예를들어 무결성 검사 결과를 True/False로 반환하는 식으로 이해했습니다.
+                    pass
+               else:
+                    print("해당 계좌의 파일이 존재하지 않습니다")
+                    return
+          # 선택한 계좌가 회원의 계좌 목록에 없을 경우
           else:
-               print("해당 계좌의 파일이 존재하지 않습니다")
+               print("이용가능한 계좌 목록에 있는 계좌의 번호만 입력해주세요")
                return
 
 
