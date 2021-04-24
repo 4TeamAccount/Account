@@ -49,8 +49,11 @@ class ChangeBuilder:
         #비정상 결과: 인자가 없는 경우 -> main에서 처리
         cli = CLIController()
         t = tag
-        if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
+        #print(f"값{t} 형태{type(t)}")
         
+        if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
+            t = t.replace(' ', '')
+            
             if any(x.isalpha() for x in t): #숫자와 문자 혼합
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
                 cli.printAllTag(ac.getAllTag('394028'))
@@ -100,12 +103,14 @@ class ChangeBuilder:
                 return
             
             tmp = t[1:-1].strip()
+        
             
             if any(x == '\n' or x == '\t' for x in t): 
                 print(".!! 오류: 태그는 탭과 개행 문자의 포함을 허용하지 않습니다.")
                 return
             
             t = ' '.join(tmp.split())
+            
             if t in main_tag: #[상위태그]
                 print("..! 상위태그입니다. 하위 태그를 입력해주세요")
                 print("")
@@ -330,10 +335,14 @@ class ChangeBuilder:
 
     def build(self, account_num, save_tag, i):
        
+        
         money = self.input_money
         
-        if '+' not in self.input_money and '-' not in self.input_money:
-            self.input_money = '+' + self.input_money
+        print(money)
+        
+        if '+' not in money and '-' not in money:
+            money = '+' + money
+            self.input_money = money
         
         save_date = self.input_date
         save_total = self.new_total
@@ -425,12 +434,16 @@ class ChangeBuilder:
                 m_res = self.setMoney(m, d[0])
             
             if m_res == 'e':
+                if not(len(d[0]) == 8 or len(d[0]) == 10):
+                    print("날짜는 ‘-’, ‘/’, ‘.’, ㅎㅎ숫자로만 써주세요.")
+                """    
                 if d:
                     for k in d:
+    
                         for c in [',', '원']:
                             if c in k:
                                 print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
-        
+                """
                 self.addChange(account_num, atag)
                 
           
@@ -486,10 +499,12 @@ if __name__ == '__main__':
             print("")
             CLIController.printAllTag(ac.getAllTag('394028'))
         else:
-            at = ch.setTag(t[0])
+            tmp = ' '.join(t)
+            tmp = tmp.strip()
+            at = ch.setTag(tmp)
             if at != None:
                 add_res = ch.addChange('394028', at)
                 if add_res == 'back':
                     print("주프롬프트 출력")
     
-    #print("main")
+    print("주프롬프트로 리턴됨")
