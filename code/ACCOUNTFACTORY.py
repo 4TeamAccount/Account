@@ -105,7 +105,7 @@ class AccountFactory:
                     name = info[find_index-1].split('\t')[0]
                     f.write(f"1{name}({self.ID})" +"\n\n")
                     f.write("태그" + "\n\n")
-                    now = datetime.datetime.now().strftime('%Y-%m-%d')
+                    now = datetime.datetime.now().strftime('%Y.%m.%d')
                     
                     f.write(f"[계좌 생성] +{balance} {now} {balance}")
                     f.close()
@@ -170,4 +170,4 @@ class AccountFactory:
 
 f = AccountFactory("qhsl1213") # 특정 ID에 대한 AccountFactory 객체를 생성.
 f.printAccount()
-f.requestPermission()
+f.createAccount()

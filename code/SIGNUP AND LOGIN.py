@@ -391,7 +391,7 @@ class UserManager:
                     f = open(UserManager.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                     f.write(f"1{name}({ID})" +"\n\n")
                     f.write("태그" + "\n\n")
-                    now = datetime.datetime.now().strftime('%Y-%m-%d')
+                    now = datetime.datetime.now().strftime('%Y.%m.%d')
                     f.write(f"[계좌 생성] +{balance} {now} {balance}")
                     f.close()
                     return
