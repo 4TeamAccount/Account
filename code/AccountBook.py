@@ -1,5 +1,5 @@
 
-
+import os
 import fileinput
 import sys
 
@@ -83,7 +83,122 @@ class CLIController:
                         sys.exit()
             else:
                 sys.exit()
+class FileManager:
+    path_home=""
+    path_dataFile=""
+    user_path=""
+    account_path=""
+    
+    def __init__(self):
+        self.path_home=""
+        self.path_dataFile=""
+        self.user_path=""
+        self.account_path=""
+    
+    # def __init__(self,path_home,path_dataFile,user_path,account_path):
+    #     self.path_home=path_home
+    #     self.path_dataFile=path_dataFile
+    #     self.user_path=user_path
+    #     self.account_path=account_path
+    
+    def executeProgramFileCheck(self):
+        try:
+            self.path_home=os.path.expanduser('~')
+            self.path_dataFile=self.path_home+r"\Accout-data"
+        except:
+            print("!!! 오류: 홈경로를 파악할 수 없습니다! 프로그램을 종료합니다.")
+            sys.exit()
+       
+        if not os.path.exists(self.path_dataFile):
+            print("..! 경고: 홈 경로"+self.path_home+"\에 데이터 파일이 없습니다.")
+            try:
+                os.makedirs(self.path_dataFile)
+                self.user_path=self.path_dataFile+r"\User"
+                os.makedirs(self.user_path)
+                self.account_path=self.path_dataFile+r"\Account"
+                os.makedirs(self.account_path)
+                print("... 홈 경로에 빈 데이터 파일을 새로 생성했습니다:")
+                print(self.path_dataFile)
+            except:
+                print("!!! 오류: 홈 경로에 데이터 파일을 생성하지 못했습니다! 프로그램을 종료합니다.")
+                sys.exit()
+        else:
+            
+            if FileManager.fileAccess(self.path_dataFile) and FileManager.fileAccess(self.user_path) and FileManager.fileAccess(self.account_path) :
+                print(path_dataFile+"에 대한 입출력 권한이 없습니다! 프로그램을 종료합니다.")
+                sys.exit()
+               
+    def fileAccess(fpath): # 권한을 알아보는 함수 정의
+        check=True
 
+        if not os.access(fpath,os.R_OK):
+            check=False
+        if not os.access(fpath,os.W_OK):
+            check=False
+        if not os.access(fpath,os.X_OK):
+            check=False
+        
+        return check
+               
+    
+
+
+    # def userAccountFileCheck:
+    #     # 사용자 계좌 목록 확인 함수
+    #     if:
+    #         #없으면 생성
+    #         try:
+    #             #계좌 생성 함수
+    #         except:
+    #             #계좌 목록 함수
+    def balanceCheck(self,file_name):
+        file=open(file_name,'r')
+        check=1
+        string=None
+        while string != '':
+            string=file.readline()
+            list=string.split(" ")
+            balance=list[len(list)-1]
+            if not balance.find("-")==-1:
+                check=0
+                break
+        file.close()
+        return check
+    
+    def accountBalanceFileCheck(self,file_name):
+        if self.balanceCheck(file_name)==0:
+            print("..! 경고: 데이터 파일에 잔고에 이상이 있습니다!")
+            temp=""
+            
+            with fileinput.FileInput(file_name,inplace=True,backup='.bak') as f:
+                for line in f:
+                    if line.find('[')!=-1:
+                        list=line.split(" ")
+                        balance=list[len(list)-1]
+                        money=""
+                        for word in list:
+                            if word[0]=='+' or word[0]=='-':
+                                money=word
+                                break
+                        consume=0
+                        if money[0]=='+':
+                            consume=int(money)
+                        elif money[0]=='-':
+                            consume=int(money)
+                        changeBalance=balance.replace("\n","")
+                        if not temp=="":
+                            line=line.replace(changeBalance,str(int(temp)+consume))
+                        print(line,end="")
+                        if not temp=="":
+                            temp=str(int(temp)+consume)
+                        else:
+                            temp=balance
+                    else:
+                        print(line,end="")
+            if(self.balanceCheck(file_name)==0):
+                print('!!! 오류: 데이터 파일에 이상이 생겨 프로그램을 종료합니다.')
+            else:
+                print('… 잔고를 새로 고침 하였습니다:')
 
 
 class Account:
@@ -340,12 +455,14 @@ class Account:
 
 
 if __name__ == "__main__":
-
-    a = Account()
-    CLIController.printAllTag(a.getAllTag('394028'))
+    fileManager=FileManager()
+    fileManager.executeProgramFileCheck()
+    fileManager.accountBalanceFileCheck(r"C:\Users\rlawj\Accout-data\Account\394028.txt")#임의의 경로입니다.
+    # a = Account()
+    # CLIController.printAllTag(a.getAllTag('394028'))
     # a.addTag(a.getAllTag('394028'))
     # a.deleteTag(a.getAllTag('394028'))
-    a.editTag(a.getAllTag('394028'))
+    # a.editTag(a.getAllTag('394028'))
     # while True:
     #     #1.무결성 검사 후 실패시 리턴
     #     select_sign=CLIController.login_menu()
