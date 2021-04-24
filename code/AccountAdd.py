@@ -136,12 +136,11 @@ class ChangeBuilder:
         srh_d = srh_date
        
         i = 0
-        
-        print("emfdjdhaus djEjgpehlsk", srh_m, type(srh_m))
+    
         
         file_name = self.ac_num + ".txt"
         self.account_file = file_name
-        f_s = open(file_name, 'r', encoding='UTF-8')
+        f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
         f_s.close()
@@ -362,7 +361,7 @@ class ChangeBuilder:
             file_name = 'tmp_change' + '.txt' #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
             #file_name = account_num + ".txt"
             self.account_file = file_name
-            f = open(file_name, 'r+', encoding='UTF-8')
+            f = open(file_name, 'r+')
             lines = f.readlines()
             line = lines[:i]
             print(line)
@@ -393,7 +392,7 @@ class ChangeBuilder:
         
         file_name = account_num + ".txt"
         self.account_file = file_name
-        f = open(file_name, 'r', encoding='UTF-8')
+        f = open(file_name, 'r')
         lines = f.readlines()
         self.total = lines[-1].split(' ')[3]
         
@@ -463,7 +462,7 @@ class Account:
         tagDict = {}
         file_name = account_num + ".txt"
         self.account_file = file_name
-        file = open(file_name, 'r', encoding='UTF-8')
+        file = open(file_name, 'r')
 
         for i in range(2): #파일 형식 이름 한줄로 바꿔서 값 바뀐 부분1
             file.readline()
