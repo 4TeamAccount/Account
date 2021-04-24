@@ -18,6 +18,18 @@ class CLIController:
                 s += 1
             m += 1
             s = 1
+
+    def printAllUser(list):
+        print("=========공용 계좌 사용자 목록=============")
+        for user in list:
+            if user[0] == '1':
+                print(user[1:] + " 관리자 권한")
+            elif user[0] == '2':
+                print(user[1:] + " 수정 및 삭제 권한")
+            elif user[0] == '3':
+                print(user[1:] + " 읽기만 가능 권한")
+            elif user[0] == '4':
+                print(user[1:])
     def login_menu():
         print("1.로그인")
         print("2.회원가입")
@@ -438,6 +450,26 @@ class Account:
         print("...태그 삭제가 완료되었습니다.")
         print(new_tag)
 
+    def getAllUser(self, account_num):
+
+        file_name = account_num + ".txt"
+        self.account_file = file_name
+        file = open(file_name, 'r', encoding='UTF-8')
+        file.readline()
+        l = file.readline()[:-1]
+        file.close()
+        userList = l.split(" ")
+        return userList
+
+    def isUser(self):
+        user = input("사용자 이름>")
+        account_num = self.account_file[0:-4]
+        userList = self.getAllUser(account_num)
+        userList = list(map(lambda x: x[1:], userList))
+        result = user in userList
+        print(result)
+        return user in userList
+
 
 
 
@@ -455,9 +487,12 @@ class Account:
 
 
 if __name__ == "__main__":
-    fileManager=FileManager()
-    fileManager.executeProgramFileCheck()
-    fileManager.accountBalanceFileCheck(r"C:\Users\rlawj\Accout-data\Account\394028.txt")#임의의 경로입니다.
+    # fileManager=FileManager()
+    # fileManager.executeProgramFileCheck()
+    # fileManager.accountBalanceFileCheck(r"C:\Users\rlawj\Accout-data\Account\394028.txt")#임의의 경로입니다.
+    a = Account()
+    CLIController.printAllUser(a.getAllUser('394028'))
+    a.isUser()
     # a = Account()
     # CLIController.printAllTag(a.getAllTag('394028'))
     # a.addTag(a.getAllTag('394028'))
