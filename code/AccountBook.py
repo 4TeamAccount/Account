@@ -216,6 +216,7 @@ class FileManager:
 class Account:
     #파일에서 5번째 줄 읽어와 Dict 구조로 태그 목록 return
     account_file = ""
+    user = ""
 
     def getAllTag(self, account_num):
 
@@ -458,19 +459,89 @@ class Account:
         file.readline()
         l = file.readline()[:-1]
         file.close()
-        userList = l.split(' ') #이거 탭으로 바꿔야
+        userList = l.split('\t') #이거 탭으로 바꿔야
         userIdList = list(map(lambda x: x[:-1].split('('), userList))
         print(userIdList)
         return userIdList
-
+    #목록에 입력한 사용자가 있으면 True 없으면 False
     def isUser(self):
         user = input("사용자 이름>")
         account_num = self.account_file[0:-4]
         userList = self.getAllUser(account_num)
-        userList = list(map(lambda x: x[1:], userList))
+        userList = list(map(lambda x: x[0][1:], userList))
         result = user in userList
-        print(result)
-        return user in userList
+        if result:
+            self.user = user
+        return result
+
+    def editPermission(self):
+        file = open(self.account_file, 'r')
+        file.readline()
+        l = file.readline()[:-1]
+        file.close()
+        permission = input("권한 입력 >")
+        account_num = self.account_file[0:-4]
+        userList = self.getAllUser(account_num)
+        perm_string = ""
+        if permission == '1':
+            perm_string = "관리자"
+        elif permission == '2':
+            perm_string = "수정 및 삭제"
+        elif permission == '3':
+            perm_string = "읽기만 가능"
+
+        if '.' in permission or '-' in permission:
+            print(".!! 오류: 소수점이 존재하지 않는 양의 정수여야 합니다.")
+            self.editPermission()
+            return
+        if permission > '4' or permission < '1':
+            print(".!! 오류: 권한 메뉴 번호가 아닙니다.")
+        if permission + self.user in l:
+            print(".!! 오류 : 기존 권한과 동일합니다.")
+            self.editPermission()
+            return
+        else:
+            for i, u in enumerate(userList):
+                if self.user in u[0]:
+                    userList[i][0] = permission + self.user
+                    temp = userList.pop(i)
+                    userList.append(temp)
+                    break
+        new_line = ""
+        for li in userList:
+            new_line += li[0] + '(' + li[1] + ')' + '\t'
+        new_line = new_line[:-1] + '\n'
+
+
+        print("... 현재까지 입력한 내역입니다.")
+        print(f"=> 사용자 이름 : {self.user}")
+        print(f"=> 변경 권한 : {perm_string}")
+
+        re = input("정말 저장하시겠습니까?>(.../No)")
+        if re == 'No' or re == 'N' or re == 'n' or re == 'no':
+            return
+        else:
+            line_count = 0
+            for line in fileinput.input(self.account_file, inplace=True):
+                if line_count == 1:
+                    line = line.replace(line, new_line)
+                line_count += 1
+                sys.stdout.write(line)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -495,6 +566,7 @@ if __name__ == "__main__":
     a = Account()
     CLIController.printAllUser(a.getAllUser('394028'))
     a.isUser()
+    a.editPermission()
     # a = Account()
     # CLIController.printAllTag(a.getAllTag('394028'))
     # a.addTag(a.getAllTag('394028'))
