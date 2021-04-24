@@ -22,14 +22,14 @@ class CLIController:
     def printAllUser(list):
         print("=========공용 계좌 사용자 목록=============")
         for user in list:
-            if user[0] == '1':
-                print(user[1:] + " 관리자 권한")
-            elif user[0] == '2':
-                print(user[1:] + " 수정 및 삭제 권한")
-            elif user[0] == '3':
-                print(user[1:] + " 읽기만 가능 권한")
-            elif user[0] == '4':
-                print(user[1:])
+            if user[0][0] == '1':
+                print(user[0][1:] + " 관리자 권한")
+            elif user[0][0] == '2':
+                print(user[0][1:] + " 수정 및 삭제 권한")
+            elif user[0][0] == '3':
+                print(user[0][1:] + " 읽기만 가능 권한")
+            elif user[0][0] == '4':
+                print(user[0][1:])
     def login_menu():
         print("1.로그인")
         print("2.회원가입")
@@ -222,7 +222,7 @@ class Account:
         tagDict = {}
         file_name = account_num + ".txt"
         self.account_file = file_name
-        file = open(file_name, 'r', encoding='UTF-8')
+        file = open(file_name, 'r')
 
         for i in range(4):
             file.readline()
@@ -454,12 +454,14 @@ class Account:
 
         file_name = account_num + ".txt"
         self.account_file = file_name
-        file = open(file_name, 'r', encoding='UTF-8')
+        file = open(file_name, 'r')
         file.readline()
         l = file.readline()[:-1]
         file.close()
-        userList = l.split(" ")
-        return userList
+        userList = l.split(' ') #이거 탭으로 바꿔야
+        userIdList = list(map(lambda x: x[:-1].split('('), userList))
+        print(userIdList)
+        return userIdList
 
     def isUser(self):
         user = input("사용자 이름>")
