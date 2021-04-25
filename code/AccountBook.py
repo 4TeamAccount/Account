@@ -119,7 +119,7 @@ class UserManager:
     PW_match3 = "^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Z\d!@#$%^&*]{3,}$"
     PW_match4 = "^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[a-z\d!@#$%^&*]{3,}$"
     PW_match5 = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{4,}$"
-    
+
     def __init__(self):
         pass
 
@@ -136,6 +136,7 @@ class UserManager:
                 # 문법 규칙 맞았을 경우, 해당 아이디가 유효한지 확인
                 file = open(UserManager.user_file, 'r', encoding = 'ANSI')
                 info = file.readlines()
+                del info[0] # 추가
                 file.close()
                 find_index = -1
                 for index, user_account in enumerate(info):
@@ -150,18 +151,18 @@ class UserManager:
                                 break
                 # ID가 유효할 경우
                 if not find_index == -1:
-                    
+
                     break
                 else:
                     print("ID를 다시 확인해주세요")
                     continue
-                
+
             else:
                 print("ID를 다시 확인해주세요")
                 continue
-                            
 
-                
+
+
         # 비밀번호 문법 규칙
         while True:
             PW = input("비밀번호 : ")
@@ -180,11 +181,11 @@ class UserManager:
             else:
                 print("비밀번호를 다시 확인해주세요")
                 continue
-                
 
-        
+
+
     def signUp(self):
-        
+
         # 회원 정보 입력
         while True:
             info = input("회원 정보를 입력해 주세요 : ")
@@ -194,7 +195,7 @@ class UserManager:
             if not info[-15].isspace():
                 print("잘못된 회원정보입니다.")
                 continue
-                
+
             name = ""
             iden_num = info[-14:]
 
@@ -203,13 +204,13 @@ class UserManager:
                         name = info[0:i+1]
                         break
 
-            
+
             # 이름 문법 규칙 : 길이 >=1, 첫/마지막은 실상 문자, 탭/개행 X
             if not (len(name)>=1 and (name[0].isprintable() and not name[0].isspace() and name[-1].isprintable()
                                         and not name[-1].isspace()) and not any(ch in name for ch in [u'\u0009', u'\u000A', u'\u000D'])):
                 print("잘못된 이름입니다. 다시 입력해주세요")
                 continue
-            
+
 
             # 주민등록번호 문법 규칙 : <6자리 생년월일><표준 공백><1,2,3,4 중 1개><6자리 숫자>
             # 14글자가 아니거나, 숫자와 표준 공백 외 다른 문자가 있을 경우
@@ -278,13 +279,14 @@ class UserManager:
                             print("잘못된 출생일입니다.")
                             continue
 
-            
+
             # 여기까지 왔으면, 주민등록번호 문법 규칙은 통과
-            
+
 
             # 회원 관리 파일 해당 회원 찾기
             file = open(UserManager.user_file, 'r', encoding = 'ANSI')
             info = file.readlines()
+            del info[0]         # 추가
             file.close()
             find_index = -1
             for index, user in enumerate(info):
@@ -316,10 +318,10 @@ class UserManager:
                             break
                         else:
                             print("정확히 y 혹은 n으로만 입력해주시기 바랍니다.")
-                            
+
             # 신규 회원인 경우
             else:
-                
+
                 # 주민등록번호 의미 규칙 : 다른 회원들의 주민등록번호와 중복되지 않아야 함
                 # 회원관리파일에서 모든 주민등록번호 불러오기
                 find_index = -1
@@ -343,7 +345,7 @@ class UserManager:
 
                 ID = ""
                 PW = ""
-                
+
                 # ID 문법 규칙
                 while(True):
                         ID = input("ID : ")
@@ -399,7 +401,7 @@ class UserManager:
                         PW = input("비밀번호 : ")
                         r1 = True
                         r2 = True
-                        
+
                         if not (len(PW)>=8 and len(PW) <=20):
                             r1 = False
                         if not (re.fullmatch(UserManager.PW_match1, PW) or re.fullmatch(UserManager.PW_match2, PW)
@@ -460,14 +462,15 @@ class UserManager:
                 f.write(ID + " " + PW + "\n")
                 f.write(str(new_account_num) +"\n\n")
                 f.close()
-                
+
                 f = open(UserManager.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
+                f.write("\n") # 추가
                 f.write(f"1{name}({ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.datetime.now().strftime('%Y.%m.%d')
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
-                
+
                 return UserManager.account_folder + f"\\{new_account_num}.txt"
 class FileManager:
     path_home=""
@@ -498,7 +501,8 @@ class FileManager:
                 os.makedirs(self.user_path)
                 self.account_path=self.path_dataFile+r"\Account"
                 os.makedirs(self.account_path)
-                with open(self.user_txt,'w',encoding='ANSI'):
+                with open(self.user_txt,'w',encoding='ANSI') as file:
+                    file.write('\n')
                     pass
                 print("... 홈 경로에 빈 데이터 파일을 새로 생성했습니다:")
                 print(self.path_dataFile)
@@ -528,6 +532,7 @@ class FileManager:
         find_index = -1
         with open(AccountFactory.user_file, 'r', encoding='ANSI') as file:
             strList=file.readlines()
+            del strList[0]
             index=-1
             check=0
             user_check=0
@@ -918,21 +923,22 @@ class Account:
                 sys.stdout.write(line)
 
 class AccountFactory:
-     
+
     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
     account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
     ID = ""
-    
+
     # 이 클래스에서 제공하는 기능은 특정 회원(ID)에 맞춰진다.
     def __init__(self, ID):
         self.ID = ID
-        
+
     # 회원관리파일에서 ID를 검색하는 코드가 중복돼서 메소드로 하나 만들었습니다.
     def IDsearch(self):
         info = []
         find_index = -1
         with open(AccountFactory.user_file, 'r', encoding='ANSI') as file:
             info = file.readlines()
+            del info[0] # 추가
             for index, user_account in enumerate(info):
             # ID를 담고있는 행에서만 검색
                 if index%4==1:
@@ -965,7 +971,7 @@ class AccountFactory:
                     else:
                          print("파일이 존재하지 않는 계좌가 발견되었습니다") 
                          return
-                    
+
                # 여기까지 왔으면 모든 계좌를 출력가능
                print("============계좌 목록 출력============")
                print(f"{'계좌번호':<10} 잔고")
@@ -975,11 +981,11 @@ class AccountFactory:
     def createAccountAsFileCheck(self,info,find_index):
         balance = 0
         info, find_index = self.IDsearch()
-        
+
         # 회원 ID를 찾았을 경우
         if not find_index == -1:
             with open(AccountFactory.user_file, 'w', encoding='ANSI') as file:
-                
+
                 # 계좌번호 생성 과정
                 account_num_list = []
                 for index, account_num in enumerate(info):
@@ -994,18 +1000,21 @@ class AccountFactory:
                 # 기존 계좌번호와 중복되지 않게하기
                 while new_account_num in account_num_list:
                         new_account_num = random.randint(100000, 999999)
-                
+
                 # 새 계좌의 계좌 번호 추가
                 info[find_index+1] = info[find_index+1][0:-1] + " " + str(new_account_num) + "\n"
+                info.insert(0, '\n') # 추가
                 file.writelines(info)
+                del info[0] # 추가
 
                 # 계좌 파일 생성
                 f = open(AccountFactory.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                 name = info[find_index-1].split('\t')[0]
+                f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.datetime.now().strftime('%Y.%m.%d')
-                
+
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
         else:
@@ -1027,11 +1036,11 @@ class AccountFactory:
                 continue
 
         info, find_index = self.IDsearch()
-        
+
         # 회원 ID를 찾았을 경우
         if not find_index == -1:
             with open(AccountFactory.user_file, 'w', encoding='ANSI') as file:
-                
+
                 # 계좌번호 생성 과정
                 account_num_list = []
                 for index, account_num in enumerate(info):
@@ -1046,18 +1055,21 @@ class AccountFactory:
                 # 기존 계좌번호와 중복되지 않게하기
                 while new_account_num in account_num_list:
                         new_account_num = random.randint(100000, 999999)
-                
+
                 # 새 계좌의 계좌 번호 추가
                 info[find_index+1] = info[find_index+1][0:-1] + " " + str(new_account_num) + "\n"
+                info.insert(0, '\n') # 추가
                 file.writelines(info)
+                del info[0] # 추가
 
                 # 계좌 파일 생성
                 f = open(AccountFactory.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                 name = info[find_index-1].split('\t')[0]
+                f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.datetime.now().strftime('%Y.%m.%d')
-                
+
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
         else:
@@ -1111,7 +1123,7 @@ class AccountFactory:
 
                             # 계좌의 권한 현황을 불러온다
                             account_data = file.readlines()
-                            permission_list = account_data[0].rstrip().split('\t')
+                            permission_list = account_data[1].rstrip().split('\t') # 추가
                             new_request = f"{name}({self.ID})"
 
                             # "이름(아이디)"가 동일한 정보가 있다면
@@ -1120,8 +1132,8 @@ class AccountFactory:
                                     print("이미 권한 요청을 했거나 사용 가능한 계좌입니다.")
                                     return
 
-                            account_data[0] = account_data[0].rstrip() + f"\t4{new_request}\n"
-                            
+                            account_data[1] = account_data[1].rstrip() + f"\t4{new_request}\n"
+
                         with open(account_file, 'w', encoding='ANSI') as file:
                             file.writelines(account_data)
                         return
@@ -1162,10 +1174,10 @@ class AccountFactory:
 
 
 if __name__ == "__main__":
-    fileManager=FileManager()
-    fileManager.executeProgramFileCheck()
-    fileManager.accountBalanceFileCheck(fileManager.account_path+r"\394028.txt")
-    fileManager.userAccountFileCheck('qhdksd89')
+    # fileManager=FileManager()
+    # fileManager.executeProgramFileCheck()
+    # fileManager.accountBalanceFileCheck(fileManager.account_path+r"\394028.txt")
+    # fileManager.userAccountFileCheck('qhdksd89')
     # a = Account()
     # CLIController.printAllUser(a.getAllUser('394028'))
     # a.isUser()
