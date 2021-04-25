@@ -172,8 +172,7 @@ class ChangeBuilder:
                     res = list(map(lambda x, y: x+' '+str(y), tmp[index:], c_tmp))
                     self.change_content = res
                     return index+4
-                
-            
+
         calc = int(self.total) + int(srh_m)
         if  calc < 0:
             return 'e'
