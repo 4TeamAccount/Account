@@ -147,7 +147,7 @@ class ChangeBuilder:
     
         
         file_name = self.ac_num + ".txt"
-        self.account_file = self.account_folder + "\\" + file_name
+        self.account_file = file_name
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
@@ -398,7 +398,7 @@ class ChangeBuilder:
         
         self.ac_num = account_num
         
-        file_name = self.account_folder + "\\" + account_num + ".txt"
+        file_name = self.account_folder + account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r')
         lines = f.readlines()
@@ -471,7 +471,7 @@ class Account:
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = self.account_folder + "\\" + account_num + ".txt"
+        file_name = self.account_folder + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 

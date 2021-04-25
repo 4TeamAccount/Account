@@ -11,6 +11,7 @@ class CLIController:
     @staticmethod
     #Account class의 getAllTag()를 통해 가져온 dict를 출력
 
+
     def printAllTag(dict):
         print("==========태그목록============")
         m = 1
@@ -51,54 +52,67 @@ class CLIController:
         print("1.수입지출 추가\n2.검색 및 수정\n3.태그편집\n4.권한이동\n5.계좌관리\n6.파일 무결성 체크\n7.종료")
         select_num=int(input("숫자를 입력하세요:"))
         return select_num
+    def tag_menu():
+        print("..! 원하시는 기능을 입력하세요.(숫자 하나)")
+        print("\t1.태그 추가\t2.태그 수정\t3.태그삭제")
+        select_num=int(input("AccountNumber >"))
+        return select_num
 
-    def accout_list():
-        print("=======================계좌 목록 출력======================\n계좌번호 \t잔고\n383902 \t500,000,000,000\n123412 \t123,456\n321432 \t3,000")
+    def account_function(ID,account_num):
+        while True:
+            filemanager=FileManager()
+            fileManager.accountBalanceFileCheck(os.path.expanduser('~') + "\\Account-data" + "\\Account\\"+account_num+".txt")
+            a=Account(account_num,ID)
+            userType=a.userTypeCheck(account_num,ID)
+            if userType=="1":
+                select_num=CLIController.manager_menu()
+                if select_num==1:
+                    print("수입지출추가부입니다.")
+                elif select_num==2:
+                    print("검색 및 수정부입니다")
+                elif select_num==3:
+                    CLIController.printAllTag(a.getAllTag(account_num))
+                    print("..! 원하시는 기능을 입력하세요.(숫자 하나)")
+                    print("\t1.태그 추가\t2.태그 수정\t3.태그삭제")
+                    select=int(input("AccountNumber >"))
+        
+                    if select==1:
+                        a.addTag(a.getAllTag(account_num))
+                    elif select==2:
+                        a.deleteTag(a.getAllTag(account_num))
+                    elif select==3:
+                        a.editTag(a.getAllTag(account_num))
+                    else:
+                        print("올바른 인자를 입력해주세요")
 
-    def account_function():#주 프롬포트를 의미 합니다.
-        #관리자라면 1 아니라면 0
-        while True:#각 메뉴가 끝나면 다시 관리자 메뉴 혹은 개인메뉴로 돌아옴
-        #계좌의 잔고 검사(파일무결성 검사) 되면1 종료해야하면0
-            account_check=1
-            if account_check==1:
-                #관리자라면 1 아니라면 0
-                manager=1
-                if manager==1:
-                    select_num=CLIController.manager_menu()
-                    if select_num==1:
-                        print("수입지출추가부입니다.")
-                    elif select_num==2:
-                        print("검색 및 수정부입니다")
-                    elif select_num==3:
-
-                        # f = open('394028.txt', '+r', encoding='UTF-8')
-                        # l = f.readlines()
-                        account = '394028'
-                        CLIController.printAllTag(Account.getAllTag(Account, account))
-                        # CLIController.printAllTag(Account.getAllTag(Account, account))
-                        # print(len(Account.getAllTag(Account, account)))
-                        Account.addTag(Account, Account.getAllTag(Account, account))
-                        # print(l)
-                    elif select_num==4:
-                        print("권한이동부입니다")
-                    elif select_num==5:
-                        print("계좌관리부입니다")
-                        break
-                    elif select_num==6:
-                        print("파일무결성체크부입니다")
-                    elif select_num==7:
-                        sys.exit()
-                elif manager==0:
-                    print("2.검색\n5.계좌관리\n7.종료")
-                    select_num=int(input("숫자를 입력하세요:"))
-                    if select_num==2:
-                        print("검색 및 수정부입니다")
-                    elif select_num==5:
-                        print("계좌관리부입니다")
-                    elif select_num==7:
-                        sys.exit()
-            else:
+                    
+                elif select_num==4:
+                    CLIController.printAllUser(a.getAllUser(account_num))
+                    a.isUser()
+                    a.editPermission()
+                elif select_num==5:
+                    break
+                elif select_num==6:
+                    pass
+                    
+                elif select_num==7:
+                    print('종료')
+                    sys.exit()
+            elif userType=="2":
+                print("2.검색\n5.계좌관리\n7.종료")
+                select_num=int(input("숫자를 입력하세요:"))
+                if select_num==2:
+                    print("검색 및 수정부입니다")
+                elif select_num==5:
+                    print("계좌관리부입니다")
+                elif select_num==7:
+                    sys.exit()
+            elif userType=="3":
                 sys.exit()
+            elif userType=="4":
+                print("미지정")
+            else:
+                print("오류")
 class UserManager:
 
     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
@@ -611,8 +625,32 @@ class Account:
     #파일에서 5번째 줄 읽어와 Dict 구조로 태그 목록 return
     account_file = ""
     user = ""
+    account_num=""
+    ID=""
     account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+    def __init__(self):
+        pass
 
+    def __init__(self,account_num,ID):
+        self.account_num=account_num
+        self.ID=ID
+
+
+    def userTypeCheck(self,account_num,ID):
+        file_name = self.account_folder + "\\" + account_num + ".txt"
+        self.account_file = file_name
+        file = open(file_name, 'r')
+        string=file.readlines()
+
+        userline=string[1]
+        userList=userline.split("\t")
+        file.close()
+        for user in userList:
+            if user.split("(")[1].replace(")","").replace("\n","")==ID:
+                return user[0]
+                break
+        
+        print("!!! 유저를 찾을 수 없습니다.")
 
     def getAllTag(self, account_num):
 
@@ -923,7 +961,6 @@ class Account:
                     line = line.replace(line, new_line)
                 line_count += 1
                 sys.stdout.write(line)
-
 class AccountFactory:
 
     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
@@ -1004,7 +1041,7 @@ class AccountFactory:
                         new_account_num = random.randint(100000, 999999)
 
                 # 새 계좌의 계좌 번호 추가
-                info[find_index+1] = info[find_index+1][0:-1] + " " + str(new_account_num) + "\n"
+                info[find_index+1] = info[find_index+1][0:-1] + str(new_account_num) + "\n"
                 info.insert(0, '\n') # 추가
                 file.writelines(info)
                 del info[0] # 추가
@@ -1079,6 +1116,7 @@ class AccountFactory:
 
 
     def selectAccount(self):
+        self.printAccount()
         select_account = input("선택할 계좌의 계좌번호를 입력해주세요 : ")
         # 선택한 계좌가 회원이 접근가능한 한지를 검사
         info, find_index = self.IDsearch()
@@ -1090,33 +1128,12 @@ class AccountFactory:
                 break
 
         # 선택한 계좌가 회원의 계좌 목록에 실제로 있는 경우
-        if that_is_my_account == True:
+        if that_is_my_account == True:                  
             # 선택한 계좌가 실제로 있는지 확인
             account_file = self.account_folder + f"\\{select_account}.txt"
-           
             # 그러한 계좌 파일이 있을 경우
             if os.path.isfile(account_file):
-                # 그 계좌에 기록된 회원의 권한이 4라면, 아직 수락받지 못했기 때문에 접근 불가해야 함.
-                with open(account_file, 'r', encoding='ANSI') as file:
-                    # 회원 이름도 불러오기
-                    name = info[find_index-1].split('\t')[0]
-                     
-                    # 계좌의 권한 현황을 불러온다
-                    account_data = file.readlines()
-                    permission_list = account_data[1].rstrip().split('\t') # 추가
-                    new_request = f"{name}({self.ID})"
-
-                    # 자기 권한이 4라면
-                    for permission in permission_list:
-                        if permission[1:] == new_request:
-                            if permission[0] == '4':
-                                print("아직 관리자가 권한 요청을 수락하지 않았습니다.")
-                                return False
-                            else:
-                                # 권한이 4가 아니라면 접근 가능
-                                fileManager=FileManager()
-                                fileManager.accountBalanceFileCheck(account_file)
-                                return True
+                return select_account
             else:
                 print("해당 계좌의 파일이 존재하지 않습니다")
                 return False
@@ -1124,7 +1141,6 @@ class AccountFactory:
         else:
             print("이용가능한 계좌 목록에 있는 계좌의 번호만 입력해주세요")
             return False
-
 
 
     def requestPermission(self):
@@ -1210,8 +1226,8 @@ if __name__ == "__main__":
     # CLIController.printAllUser(a.getAllUser('394028'))
     # a.isUser()
     # a.editPermission()
-    # a = Account()
-    # CLIController.printAllTag(a.getAllTag('394028'))
+    a = Account('776401','qhdksd89')
+    CLIController.printAllTag(a.getAllTag('776401'))
     # a.addTag(a.getAllTag('394028'))
     # a.deleteTag(a.getAllTag('394028'))
     # a.editTag(a.getAllTag('394028'))
@@ -1221,7 +1237,8 @@ if __name__ == "__main__":
         userManager=UserManager()
         
         select_sign=CLIController.login_menu()
-    
+        account_num=""
+        ID=""
         if select_sign==1:
             ID=userManager.login()
             fileManager.userAccountFileCheck(ID)
@@ -1229,22 +1246,20 @@ if __name__ == "__main__":
             accountFactory.printAccount()
             while True:
                 select_account=CLIController.account_manage_menu()
-                if select_account==1:#계좌가 존재하지 않으면 다시 반복    
-                    account_exist=accountFactory.selectAccount()
-                    if account_exist:
-                        break
+                if select_account==1:
+                    account_num=accountFactory.selectAccount()
+                    if account_num!=False:
+                            CLIController.account_function(ID,account_num)
                 elif select_account==2:
                     accountFactory.createAccount()
                     
                 elif select_account==3:
                     accountFactory.requestPermission()
-            while True:
-                CLIController.account_function()
+            
         elif select_sign==2:
             account_path=userManager.signUp()
             account=Account()
-            while True:
-                CLIController.account_function()
+            
         elif select_sign==3:
             print("종료")
             sys.exit()
