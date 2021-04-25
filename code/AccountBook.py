@@ -11,6 +11,7 @@ class CLIController:
     @staticmethod
     #Account class의 getAllTag()를 통해 가져온 dict를 출력
 
+
     def printAllTag(dict):
         print("==========태그목록============")
         m = 1
@@ -22,6 +23,14 @@ class CLIController:
                 s += 1
             m += 1
             s = 1
+    def printSomeTag(self, m_tag):
+        print("===================[{}] 하위 태그 목록 출력====================" .format(m_tag))
+        m = main_tag.index(m_tag) + 1
+        s = 1
+        print(f"{m}[{m_tag}]")
+        for val in sub_tag[m-1]:
+            print(f" ㄴ{m}.{s}  {val}")
+            s += 1
 
     def printAllUser(list):
         print("=========공용 계좌 사용자 목록=============")
@@ -38,67 +47,123 @@ class CLIController:
         print("1.로그인")
         print("2.회원가입")
         print("3.종료")
-        select_sign=int(input("숫자를 입력하세요:"))
+        select_sign=input("AccountBook >")
         return select_sign
     def account_manage_menu():
-        print("1.계좌선택")
-        print("2.계좌생성")
-        print("3.권한요청")
-        select_account=int(input("숫자를 입력하세요:"))
+        print("=======================계좌 메뉴 출력==========================")
+        print("1.계좌선택\t2.계좌생성\t3.권한요청")
+        
+        select_account=input("AccountNumber >")
         return select_account
     
     def manager_menu():
         print("1.수입지출 추가\n2.검색 및 수정\n3.태그편집\n4.권한이동\n5.계좌관리\n6.파일 무결성 체크\n7.종료")
-        select_num=int(input("숫자를 입력하세요:"))
+        c,*t=input("AccountNumber >").split()
+        return c,t
+    def tag_menu():
+        print("..! 원하시는 기능을 입력하세요.(숫자 하나)")
+        print("\t1.태그 추가\t2.태그 수정\t3.태그삭제")
+        select_num=int(input("AccountNumber >"))
         return select_num
+    def printCommend():
+        print("=======================================================")
+        print("\t명령어군\t\t올바른인자들\t\t설명")
+        print("",end="\t")
 
-    def accout_list():
-        print("=======================계좌 목록 출력======================\n계좌번호 \t잔고\n383902 \t500,000,000,000\n123412 \t123,456\n321432 \t3,000")
+    def account_function(ID,account_num):
+        while True:
+            filemanager=FileManager()
+            fileManager.accountBalanceFileCheck(os.path.expanduser('~') + "\\Account-data" + "\\Account\\"+account_num+".txt")
+            a=Account(account_num,ID)
+            userType=a.userTypeCheck(account_num,ID)
+            if userType=="1":
+                select_num,t=CLIController.manager_menu()
+                if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
+                    ch = ChangeBuilder(account_num)
+                    tags = a.getAllTag(account_num)
+                    main_tag = list(tags.keys())
+                    sub_tag = list(tags.values())
+                    if t == []:
+                        print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
+                        print("")
+                        CLIController.printAllTag(a.getAllTag(account_num))
+                    else:
+                        tmp = ' '.join(t)
+                        tmp = tmp.strip()
+                        at = ch.setTag(tmp)
+                        if at != None:
+                            add_res = ch.addChange(account_num, at)
+                            if add_res == 'back':
+                                pass
+                
+                elif select_num=="2":
+                    print("수입지출추가부입니다.")
+                
+                    
+                elif select_num=="3" or select_num=='tag' or select_num=='t' or select_num=='[':
+                    while True:
+                        CLIController.printAllTag(a.getAllTag(account_num))
+                        print("..! 원하시는 기능을 입력하세요.(숫자 하나)")
+                        print("\t1.태그 추가\t2.태그 수정\t3.태그삭제")
+                        select=input("AccountNumber >")
+                    
+                        if select=="1":
+                            a.addTag(a.getAllTag(account_num))
+                            break
+                        elif select=="2":
+                            a.deleteTag(a.getAllTag(account_num))
+                            break
+                        elif select=="3":
+                            a.editTag(a.getAllTag(account_num))
+                            break
+                        else:
+                            print("..! 오류:1~3중의 숫자만 입력해주세요")
+                            break
 
-    def account_function():#주 프롬포트를 의미 합니다.
-        #관리자라면 1 아니라면 0
-        while True:#각 메뉴가 끝나면 다시 관리자 메뉴 혹은 개인메뉴로 돌아옴
-        #계좌의 잔고 검사(파일무결성 검사) 되면1 종료해야하면0
-            account_check=1
-            if account_check==1:
-                #관리자라면 1 아니라면 0
-                manager=1
-                if manager==1:
-                    select_num=CLIController.manager_menu()
-                    if select_num==1:
-                        print("수입지출추가부입니다.")
-                    elif select_num==2:
-                        print("검색 및 수정부입니다")
-                    elif select_num==3:
-
-                        # f = open('394028.txt', '+r', encoding='UTF-8')
-                        # l = f.readlines()
-                        account = '394028'
-                        CLIController.printAllTag(Account.getAllTag(Account, account))
-                        # CLIController.printAllTag(Account.getAllTag(Account, account))
-                        # print(len(Account.getAllTag(Account, account)))
-                        Account.addTag(Account, Account.getAllTag(Account, account))
-                        # print(l)
-                    elif select_num==4:
-                        print("권한이동부입니다")
-                    elif select_num==5:
-                        print("계좌관리부입니다")
+                    
+                elif select_num=="4" or select_num=='permission' or select_num=='p' or select_num=='@':
+                    if t ==[]:
+                        CLIController.printAllUser(a.getAllUser(account_num))
+                        a.isUser()
+                        a.editPermission()
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                elif select_num=="5" or select_num=='manage' or select_num=='m' or select_num=='>':
+                    if t ==[]:
                         break
-                    elif select_num==6:
-                        print("파일무결성체크부입니다")
-                    elif select_num==7:
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                elif select_num=="6" or select_num=='veryfy' or select_num=='f' or select_num=='!':
+                    if t ==[]:
+                        pass
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                    
+                elif select_num=="7" or select_num=='quit' or select_num=='q' or select_num=='.':
+                    if t ==[]:
                         sys.exit()
-                elif manager==0:
-                    print("2.검색\n5.계좌관리\n7.종료")
-                    select_num=int(input("숫자를 입력하세요:"))
-                    if select_num==2:
-                        print("검색 및 수정부입니다")
-                    elif select_num==5:
-                        print("계좌관리부입니다")
-                    elif select_num==7:
-                        sys.exit()
-            else:
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                    
+                else:
+                    CLIController.printCommend()
+
+
+            elif userType=="2":
+                print("2.검색\n5.계좌관리\n7.종료")
+                select_num=int(input("숫자를 입력하세요:"))
+                if select_num==2:
+                    print("검색 및 수정부입니다")
+                elif select_num==5:
+                    print("계좌관리부입니다")
+                elif select_num==7:
+                    sys.exit()
+            elif userType=="3":
                 sys.exit()
+            elif userType=="4":
+                print("미지정")
+            else:
+                print("오류")
 class UserManager:
 
     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
@@ -611,17 +676,43 @@ class Account:
     #파일에서 5번째 줄 읽어와 Dict 구조로 태그 목록 return
     account_file = ""
     user = ""
+    account_num=""
+    ID=""
+    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+    def __init__(self):
+        pass
+
+    def __init__(self,account_num,ID):
+        self.account_num=account_num
+        self.ID=ID
+
+
+    def userTypeCheck(self,account_num,ID):
+        file_name = self.account_folder + "\\" + account_num + ".txt"
+        self.account_file = file_name
+        file = open(file_name, 'r')
+        string=file.readlines()
+
+        userline=string[1]
+        userList=userline.split("\t")
+        file.close()
+        for user in userList:
+            if user.split("(")[1].replace(")","").replace("\n","")==ID:
+                return user[0]
+                break
+        
+        print("!!! 유저를 찾을 수 없습니다.")
 
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = account_num + ".txt"
+        file_name = self.account_folder + "\\" + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 
-        for i in range(4):
+        for i in range(3):
             file.readline()
-            if i == 3:
+            if i == 2:
                 l = file.readline()
         file.close()
         sl = l.split(" ")
@@ -847,7 +938,7 @@ class Account:
 
     def getAllUser(self, account_num):
 
-        file_name = account_num + ".txt"
+        file_name = self.account_folder + "\\" + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
         file.readline()
@@ -921,7 +1012,6 @@ class Account:
                     line = line.replace(line, new_line)
                 line_count += 1
                 sys.stdout.write(line)
-
 class AccountFactory:
 
     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
@@ -1002,7 +1092,7 @@ class AccountFactory:
                         new_account_num = random.randint(100000, 999999)
 
                 # 새 계좌의 계좌 번호 추가
-                info[find_index+1] = info[find_index+1][0:-1] + " " + str(new_account_num) + "\n"
+                info[find_index+1] = info[find_index+1][0:-1] + str(new_account_num) + "\n"
                 info.insert(0, '\n') # 추가
                 file.writelines(info)
                 del info[0] # 추가
@@ -1094,9 +1184,7 @@ class AccountFactory:
             account_file = self.account_folder + f"\\{select_account}.txt"
             # 그러한 계좌 파일이 있을 경우
             if os.path.isfile(account_file):
-                fileManager=FileManager()
-                fileManager.accountBalanceFileCheck(account_file)
-                return True
+                return select_account
             else:
                 print("해당 계좌의 파일이 존재하지 않습니다")
                 return False
@@ -1115,35 +1203,481 @@ class AccountFactory:
             while True:
                 answer = input("해당 계좌에 권한을 요청할까요?(y/n) : ")
                 if answer == 'y':
-                        # 해당 계좌 파일에 권한 요청을 기록
-                        with open(account_file, 'r', encoding='ANSI') as file:
-                            # 회원 이름도 같이 기록하기 위해 불러오기
-                            info, find_index = self.IDsearch()
-                            name = info[find_index-1].split('\t')[0]
+                    # 해당 계좌 파일에 권한 요청을 기록
+                    with open(account_file, 'r', encoding='ANSI') as file:
+                        # 회원 이름도 같이 기록하기 위해 불러오기
+                        info, find_index = self.IDsearch()
+                        name = info[find_index-1].split('\t')[0]
 
-                            # 계좌의 권한 현황을 불러온다
-                            account_data = file.readlines()
-                            permission_list = account_data[1].rstrip().split('\t') # 추가
-                            new_request = f"{name}({self.ID})"
+                        # 계좌의 권한 현황을 불러온다
+                        account_data = file.readlines()
+                        permission_list = account_data[1].rstrip().split('\t') # 추가
+                        new_request = f"{name}({self.ID})"
 
-                            # "이름(아이디)"가 동일한 정보가 있다면
-                            for permission in permission_list:
-                                if permission[1:] == new_request:
-                                    print("이미 권한 요청을 했거나 사용 가능한 계좌입니다.")
-                                    return
+                        # "이름(아이디)"가 동일한 정보가 있다면
+                        for permission in permission_list:
+                            if permission[1:] == new_request:
+                                print("이미 권한 요청을 했거나 사용 가능한 계좌입니다.")
+                                return
 
-                            account_data[1] = account_data[1].rstrip() + f"\t4{new_request}\n"
+                        account_data[1] = account_data[1].rstrip() + f"\t4{new_request}\n" # 추가
 
-                        with open(account_file, 'w', encoding='ANSI') as file:
-                            file.writelines(account_data)
+                        # 회원관리파일에 방금 권한 요청한 계좌번호 기록
+                        info, find_index = self.IDsearch()
+                        with open(self.user_file, 'w', encoding='ANSI') as file:
+                            info[find_index+1] = info[find_index+1][0:-1] + " " + request_account + "\n"
+                            info.insert(0, '\n') # 추가
+                            file.writelines(info)
+                                 
+                    with open(account_file, 'w', encoding='ANSI') as file:
+                        file.writelines(account_data)                           
                         return
                 elif answer == 'n':
-                        return
+                    return
                 else:
-                        print("응답은 y/n로만 가능합니다")
+                    print("응답은 y/n로만 가능합니다")
         else:
             print("해당 계좌 파일이 존재하지 않습니다.")
 
+user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
+account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+
+
+tags = dict()
+main_tag = []
+sub_tag = []
+class ChangeBuilder:
+    
+    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+    
+    input_tag = ''
+    input_money = ''
+    input_date = ''
+    total = ''
+    new_total = ''
+    ac_num = ''
+    change_content = []
+    account_num=""
+    
+    def __init__(self,account_num):
+        self.account_num=account_num
+
+    
+    def setTag(self, tag): #tag가 [태그] or x.x로 들어옴
+        #비정상 결과: 인자가 없는 경우 -> main에서 처리
+        ac=Account(self.account_num,"")
+        cli = CLIController()
+        t = tag
+        #print(f"값{t} 형태{type(t)}")
+        
+        if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
+            t = t.replace(' ', '')
+            
+            if any(x.isalpha() for x in t): #숫자와 문자 혼합
+                print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                cli.printAllTag(ac.getAllTag(self.account_num))
+                return
+            
+            if t.count('.') >= 2:
+                print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+                return
+            elif not '.' in t and not 1 <= int(t) <= len(main_tag):
+                print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+                return
+                
+            if 1 <= float(t) < len(main_tag) + 0.1*len(sub_tag[-1]): #태그 목록 숫자 사이에 존재
+                if not '.' in t: #상위 태그
+                    print("..! 상위태그입니다. 하위 태그를 입력해주세요")
+                    print("")
+                    m_tag = main_tag[int(t)-1]
+                    cli.printSomeTag(m_tag)
+                    return
+                else:
+                    """
+                    if t[-1] == '.':
+                        print("오류 체크 추가 필요")
+                        return
+                    """
+                    i = list(map(int,t.split('.')))
+                    if i[1] <= len(sub_tag[i[0]-1]):
+                        #input_tag = t #정상 결과: 하위 숫자
+                        #print("정상 입력 숫자: {}" .format(t)) #확인용! 나중에 지우기
+                        return i
+
+                    else:
+                        print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                        cli.printAllTag(ac.getAllTag(self.account_num))
+                        return
+            else:
+                print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                cli.printAllTag(ac.getAllTag(self.account_num))
+                return
+                
+        else: #입력이 문자
+            if t.count('[') >= 2:
+                print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]를 입력해야 합니다.")
+                return
+            elif t.count('[') == 0 or t.count(']') == 0:
+                print(".!! 오류: 태그를 '[', ']'로 감싸야 합니다.")
+                return
+            
+            tmp = t[1:-1].strip()
+        
+            
+            if any(x == '\n' or x == '\t' for x in t): 
+                print(".!! 오류: 태그는 탭과 개행 문자의 포함을 허용하지 않습니다.")
+                return
+            
+            t = ' '.join(tmp.split())
+            
+            if t in main_tag: #[상위태그]
+                print("..! 상위태그입니다. 하위 태그를 입력해주세요")
+                print("")
+                cli.printSomeTag(t)
+                return 
+            elif not t in sum(sub_tag, []):
+                print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                cli.printAllTag(ac.getAllTag(self.account_num))
+                return
+            else:
+                #print("정상 입력 태그: {}" .format(t)) #확인용 지우기
+                return t
+            
+
+    def search(self, srh_date, *srh_money):
+        
+        if '원' in srh_money[0][-1]:
+            srh_m = srh_money[0][:-1]
+        else:
+            srh_m = srh_money[0]
+        
+        self.input_money = srh_m
+        srh_d = srh_date
+       
+        i = 0
+    
+        
+        file_name = self.ac_num + ".txt"
+        self.account_file = file_name
+        f_s = open(file_name, 'r')
+        lines = f_s.readlines()
+        
+        f_s.close()
+        
+        
+        days = [] #내역에서 날짜만 뽑은거
+        for l in lines[4:]:
+            p = l.split(' ')[-2]
+            days.append(p)
+        
+        i = 4
+        change_content = lines[int(i):]
+        tmp = list(map(lambda x: x.rstrip(), change_content))
+    
+        current = list(map(lambda x: x.split(' ')[-1], tmp)) #합계만 자른거
+        tmp2 = list(map(lambda x: x[:-1].split(' ')[:-1], tmp)) 
+        tmp = list(map(lambda x: ' '.join(x), tmp2)) #합계 전까지만 자른거
+      
+        for index, t in enumerate(days):
+            
+            if srh_d < t:
+                c_tmp = list(int(x) + int(srh_m) for x in current[index:])
+                self.new_total = c_tmp[-1] + int(srh_m)
+                
+                if any(c < 0 for c in c_tmp): #이후 내역이 입력 금액 때문에 음수가 되는 상황
+                    self.new_total = ''
+                    return 'e'
+                else:
+                    res = list(map(lambda x, y: x+' '+str(y), tmp[index:], c_tmp))
+                    self.change_content = res
+                    return index+4
+                
+            
+        calc = int(self.total) + int(srh_m)
+        if  calc < 0:
+            return 'e'
+        else:
+            self.new_total = calc
+            return len(tmp)+4
+        
+
+    def setMoney(self, money, *date):
+        mo = money
+        da = ''
+    
+        digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        head = ['-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        mids = [',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        tail  = ['원', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        
+        
+        if len(mo) == 1 and not mo[0] in digits:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("문자열 길이가 1이라면 그 문자는 무조건 숫자여야 함") #목업 따로 없어서 추가했습니다.
+            #print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            return 'e'
+        elif len(mo) == 1:
+            return mo
+        
+        if not mo[0] in head: #숫자 맨 앞은 숫자랑 + -로만 가능"
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            return 'e'
+        
+        for k in mo[1:-1]:
+            flag = False
+            for mid in mids:
+                if mid in k:
+                    flag = True
+                
+            if flag == False:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+                return 'e'
+    
+        if not mo[-1] in tail: #숫자 끝은 원이랑 숫자만 가능
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            return 'e'
+        
+        if date != ():
+            da = date[0]
+            print("확인", da)
+            res_d = self.setDate(da)
+            if res_d != 'e': #숫자 입력 규칙 만족!
+                print("금액 비교하러 출동")
+                s = self.search(res_d, mo)
+                if  s != 'e':
+                    print("인덱스 보자", s)
+                    print("금액 가능!")
+                    return s
+                else:
+                    print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                    return 'e'
+            else:
+                return 'e'
+        else:
+            res_d = datetime.today().strftime("%Y.%m.%d")
+            self.input_date = res_d
+            s = self.search(res_d, mo)
+            if s != 'e':
+                return s
+            else:
+                print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                return 'e'
+        
+    
+    def setDate(self, date):
+        d = date
+        num = re.findall("\d+", d)
+    
+        
+        if '.' in d and (d.count('-') != 0 or d.count('/')):
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.") #이게 조금 더 명확한 것 같음?
+            return 'e'
+        
+        elif '-' in d and (d.count('.') != 0 or d.count('/')):
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.")
+            return 'e'
+        elif '/' in d and (d.count('.') != 0 or d.count('-')):
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.")
+            return 'e'
+            
+        print(f"기존 숫자 {d} 변환 숫자{num}")
+        if len(num) == 1:#20210102 경우
+            num = "".join(num)
+            if len(num) != 8:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
+                return 'e'
+            else:
+                tmp = [num[:4], num[4:6], num[6:]]
+                #res = num[:4] + '.' + num[4:6] + '.' + num[6:]
+                num = tmp
+                
+        elif len(num) == 3:
+            if len(num[0]) != 4:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 연도는 4자리로 입력해야 합니다.")
+                return 'e'
+            
+            if any(map(lambda x: len(x) != 2, num[1:])):
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
+                return 'e'
+        else:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print(".!! 오류: 연도는 4자리, 월과 일은 2자리로 입력해야 합니다.")
+            return 'e'
+        
+        num = list(map(int, num))
+        check = ['-', '/', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        #print(num)
+        
+        
+        for k in d:
+            flag = False
+            for ch in check:
+                if ch in k:
+                    flag = True
+            if flag == False:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                return 'e'
+        
+        today = datetime.today()
+        if 1970 > num[0] or num[0] > 2037:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print(".!! 오류: 연도가 1970년 이후부터 2037년 이전까지여야 합니다.")
+            return 'e'
+        
+        try: 
+            day = datetime(num[0], num[1], num[2])
+            if day > today:
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print(".!! 오류: 미래의 내역은 작성할 수 없습니다.")
+                return 'e'
+        except:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+            print(".!! 오류: 해당 날짜가 현행 그레고리력에 존재하는 날짜여야 합니다.")
+            return 'e'
+        
+        print("setDate 부분")
+        res = day.strftime("%Y.%m.%d")
+        self.input_date = res
+        return res
+            
+
+    def build(self, account_num, save_tag, i):
+       
+        
+        money = self.input_money
+        
+        print(money)
+        
+        if '+' not in money and '-' not in money:
+            money = '+' + money
+            self.input_money = money
+        
+        save_date = self.input_date
+        save_total = self.new_total
+        
+        #print("저장할 날짜 형태 보장", save_date)
+        saved_data = f"{save_tag} {money} {save_date} {save_total}"
+        
+        print(f"입력 내용: {save_tag} {money}원 {save_date} {save_total}")    
+        
+        save_check = input("AccountNumber> 정말 저장하시겠습니까? (.../No) >")
+        
+        if save_check == "No":
+            return 'back'
+        else:
+            self.input_tag = save_tag
+            
+            file_name = self.account_folder + account_num + ".txt" #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
+            #file_name = account_num + ".txt"
+            self.account_file = file_name
+            f = open(file_name, 'r+')
+            lines = f.readlines()
+            line = lines[:i]
+            print(line)
+            
+            cc = self.change_content
+            cc.append(saved_data)
+            cc = list(map(lambda x: x+'\n', cc))
+            
+            res = line + cc
+            
+            f.seek(0)
+            f.writelines(res)
+            f.truncate()
+            f.close()
+            
+            self.input_tag = ''
+            self.input_money = ''
+            self.input_date = ''
+            return 
+            
+    
+    def addChange(self, account_num, atag):
+        t = ''
+        m = ''
+        d = ''
+        
+        self.ac_num = account_num
+        
+        file_name = self.account_folder + account_num + ".txt"
+        self.account_file = file_name
+        f = open(file_name, 'r')
+        lines = f.readlines()
+        self.total = lines[-1].split(' ')[3]
+        
+        f.close()
+        
+        
+        if type(atag) == list:
+                try:
+                    m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split( ))
+                    t = f"[{main_tag[at[0]-1]}][{sub_tag[at[0]-1][at[1]-1]}]"
+                    
+                except ValueError:
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                    print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+                    self.addChange(account_num, atag)
+        elif type(atag) == str:
+            main_key = ''
+            for key, value in tags.items():
+                if at in value:
+                    main_key = key
+                    break
+            try:    
+                m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_key, at)).split( ))
+                t = f"[{main_key}][{at}]"
+                
+            except ValueError:
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                    print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+        
+        if len(d) >= 2:
+            print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
+            self.addChange(account_num, atag)
+        else:
+            #print("d형태", d[0])
+            if len(d) == 0:    
+                m_res = self.setMoney(m)
+            else:
+                m_res = self.setMoney(m, d[0])
+            
+            if m_res == 'e':
+                if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
+                    print(".!! 오류: 날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                    return 'e'
+                else:
+                    return 'e'
+                
+                """    
+                if d:
+                    for k in d:
+    
+                        for c in [',', '원']:
+                            if c in k:
+                                print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                """
+                self.addChange(account_num, atag)
+                
+          
+            else:
+                save_res = self.build(account_num, t, m_res)
+                if save_res == 'back':
+                    print("주 프롬프트 출력해야함!")
+                    return 'back'
+            
+            
+        #print("입력/지출 부분")
+        
 
 
 
@@ -1182,8 +1716,8 @@ if __name__ == "__main__":
     # CLIController.printAllUser(a.getAllUser('394028'))
     # a.isUser()
     # a.editPermission()
-    # a = Account()
-    # CLIController.printAllTag(a.getAllTag('394028'))
+    # a = Account('776401','qhdksd89')
+    # CLIController.printAllTag(a.getAllTag('776401'))
     # a.addTag(a.getAllTag('394028'))
     # a.deleteTag(a.getAllTag('394028'))
     # a.editTag(a.getAllTag('394028'))
@@ -1193,31 +1727,37 @@ if __name__ == "__main__":
         userManager=UserManager()
         
         select_sign=CLIController.login_menu()
-    
-        if select_sign==1:
+        account_num=""
+        ID=""
+        if select_sign=="1":
             ID=userManager.login()
             fileManager.userAccountFileCheck(ID)
             accountFactory=AccountFactory(ID)
-            accountFactory.printAccount()
+            
+            commandCheck=0
             while True:
+                accountFactory.printAccount()
                 select_account=CLIController.account_manage_menu()
-                if select_account==1:#계좌가 존재하지 않으면 다시 반복    
-                    account_exist=accountFactory.selectAccount()
-                    if account_exist:
-                        break
-                elif select_account==2:
+                if select_account=="1":
+                    account_num=accountFactory.selectAccount()
+                    if account_num!=False:
+                            CLIController.account_function(ID,account_num)
+                elif select_account=="2":
                     accountFactory.createAccount()
                     
-                elif select_account==3:
+                elif select_account=="3":
                     accountFactory.requestPermission()
-            while True:
-                CLIController.account_function()
-        elif select_sign==2:
+                elif select_account=="manage":
+                    pass
+                elif not select_account.find("manage")==-1 and not select_account=="manage":
+                    print(".!! 오류: 인자가 없어야 합니다.")
+
+            
+        elif select_sign=="2":
             account_path=userManager.signUp()
             account=Account()
-            while True:
-                CLIController.account_function()
-        elif select_sign==3:
+            
+        elif select_sign=="3":
             print("종료")
             sys.exit()
             break

@@ -3,8 +3,13 @@ import datetime as dt
 import re
 import fileinput
 import sys
+import os
 
 #ACCOUNT_PATH = "C:/Users/thekoo/Documents/GitHub/Account/394028.txt"
+
+user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
+account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+
 
 tags = dict()
 main_tag = []
@@ -36,6 +41,9 @@ class CLIController:
             s += 1
             
 class ChangeBuilder:
+    
+    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+    
     input_tag = ''
     input_money = ''
     input_date = ''
@@ -357,7 +365,7 @@ class ChangeBuilder:
         else:
             self.input_tag = save_tag
             
-            file_name = 'tmp_change' + '.txt' #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
+            file_name = self.account_folder + account_num + ".txt" #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
             #file_name = account_num + ".txt"
             self.account_file = file_name
             f = open(file_name, 'r+')
@@ -389,7 +397,7 @@ class ChangeBuilder:
         
         self.ac_num = account_num
         
-        file_name = account_num + ".txt"
+        file_name = self.account_folder + account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r')
         lines = f.readlines()
@@ -432,8 +440,12 @@ class ChangeBuilder:
                 m_res = self.setMoney(m, d[0])
             
             if m_res == 'e':
-                if not(len(d[0]) == 8 or len(d[0]) == 10):
-                    print("날짜는 ‘-’, ‘/’, ‘.’, ㅎㅎ숫자로만 써주세요.")
+                if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
+                    print(".!! 오류: 날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                    return 'e'
+                else:
+                    return 'e'
+                
                 """    
                 if d:
                     for k in d:
@@ -456,10 +468,13 @@ class ChangeBuilder:
         
 
 class Account:
+    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+    
+    
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = account_num + ".txt"
+        file_name = self.account_folder + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 
