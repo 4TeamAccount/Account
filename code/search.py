@@ -1,11 +1,12 @@
 import os
 
+
 class SearchResult:
     def __init__(self, account_num, userid, search):
         self.account_num = account_num
         self.filepath = '..\\' + account_num + '.txt'
         self.file = open(self.filepath, 'r', encoding='ANSI')
-        self.backup=[]
+        self.backup = []
         for i in range(5):
             l = self.file.readline()
             if i == 2:
@@ -19,21 +20,19 @@ class SearchResult:
             d = change.split(' ')[-2]
             self.days.append(d)
         # run
-        # match_list = self.search_change(self.make_search_list(search))
-
-        testlist1 = ["2021.", "2021.02."]
-        testlist2 = []
-        match_list = self.search_change([testlist1, testlist2])
-
+        match_list = self.search_change(self.make_search_list(search))
         if self.usertype == 1 or self.usertype == 2:
             select_change = self.select_change(match_list)
-            if select_change != None:
+            if select_change is not None:
                 self.after_find_menu(select_change)
         else:
             print("주프롬프트로 돌아감")
             return
 
-    # def make_search_list(self, search):
+    def make_search_list(self, search):
+        search_list = [["2021.", "2021.02."], []]
+        # search에서 search_list[search_date_list,search_tag_list] 만들어 반환
+        return search_list
 
     def search_change(self, search_list):  # 태그, 날짜 구분해 두 리스트로 받아오기
         search_date_list = search_list[0]
@@ -84,7 +83,7 @@ class SearchResult:
         match_list = sorted(match_set)
         j = 1
         for i in match_list:
-            print(j, self.changes[i], end='')
+            print(j, " ".join(self.changes[i].split()[:-1]))
             j += 1
         print()
         return match_list  # 파일에서 각 change의 줄(line) 수만 저장해 반환
@@ -101,7 +100,7 @@ class SearchResult:
                 print("..! 존재하지 않는 번호입니다. 범위 내의 정수만 입력할 수 있습니다.")
 
     def after_find_menu(self, selected_change_num):
-        print("선택된 내역: ", self.changes[selected_change_num])
+        print("선택된 내역: ", " ".join(self.changes[selected_change_num].split()[:-1]))
         print("..! 원하시는 기능을 입력하세요(숫자 하나)")
         print("1.내역 수정    2. 내역 삭제     3. 취소")
         while True:
@@ -110,7 +109,7 @@ class SearchResult:
                 self.edit_change(selected_change_num)
                 break
             if select == 2:
-                confirm = input("AccountNumber> 정말 삭제하시겠습니까? (Yes/...) >")
+                confirm = input("AccountNumber> 정말 삭제하시겠습니까? (Yes/...) > ")
                 if confirm == "Yes":
                     self.delete_change(selected_change_num)
                 break
@@ -119,44 +118,73 @@ class SearchResult:
             else:
                 print("..! 1~3 중 원하는 기능의 메뉴 번호를 입력하세요.")
                 print("1.내역 수정    2. 내역 삭제     3. 취소")
-                print("선택된 내역: ", self.changes[selected_change_num])
+                print("선택된 내역: ", " ".join(self.changes[selected_change_num].split()[:-1]))
 
         print("주프롬프트로 돌아감")
         return
 
     def edit_change(self, change_num):
-        print("수정")
+        while True:
+            s = input("AccountNumber> 내역 수정> ")
+            if len(s) != 0 and s != ' ':  # 공백 여러개 입력 시 예외처리...
+                c, *t = s.split()
+                if c == 'tag':
+                    # new_change = set_tag()
+                    break;
+                elif c == 'date':
+                    # new_change = set_date()
+                    break;
+                elif c == 'money':
+                    # new_change = set_money()
+                    break;
+            print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
+            print("입력 예시) tag [카페]")
+            print("          date 2021.01.02")
+            print("          moeny -1000원")
+            print()
+
+        new_change = "[음식][식사] -2000 2021.01.25 13000\n"
+        print("수정된 내역: ", " ".join(new_change.split()[:-1]))
+        confirm = input("AccountNumber> 정말 수정하시겠습니까? (.../No) > ")
+        if confirm == "No":
+            return
+
+        if self.process_integrity(int(new_change.split(' ')[-3]), change_num) != -1:
+            self.changes[change_num] = new_change
+            self.update_file()
+            print("..! 수정 성공")
 
     def delete_change(self, change_num):
-        money = int(self.changes[change_num].split(' ')[-3])
-        if self.process_integrity(money, change_num)!=-1:
+        if self.process_integrity(0, change_num) != -1:
             del self.changes[change_num]
             self.update_file()
             print("..! 삭제 성공")
-        # 무결성 처리 진행 후 종료
+            # 무결성 처리 진행 후 종료
 
-    def process_integrity(self, money, index):
+    def process_integrity(self, new_money, index):
         balances = []
+        gap = int(self.changes[index].split(' ')[-3]) - new_money
         for i, change in enumerate(self.changes):
             if i >= index:
                 balance = change.split(' ')[-1]
-                new_balance = int(balance) - money
+                new_balance = int(balance) - gap
                 if new_balance < 0:
-                    print("..! 삭제 실패: 음수 잔고 발생")
-                    return -1 # 잔고 음수 발생
+                    print("..! 작업 실패: 음수 잔고 발생")
+                    return -1  # 잔고 음수 발생
                 balances.append(str(new_balance))
         for i, change in enumerate(self.changes):
             if i >= index:
                 balance = change.split(' ')[-1]
-                self.changes[i] = change.replace(balance, balances[i-index]+'\n')
+                self.changes[i] = change.replace(balance, balances[i - index] + '\n')
 
     def update_file(self):
         os.remove(self.filepath)
         self.file = open(self.filepath, 'w', encoding='ANSI')
-        final_list=self.backup+self.changes
+        final_list = self.backup + self.changes
         self.file.seek(0)
         self.file.writelines(final_list)
         self.file.close()
+
 
 # test = 기획서 상 main에 추가해주세요
 if __name__ == '__main__':
@@ -165,13 +193,3 @@ if __name__ == '__main__':
     c, *t = input("AccountNumber > ").split()
     if c == 'find':  # 메인에서 그 외 명령어들 포함해주세요!
         SearchResult(current_account, current_userid, t)
-        '''
-        if t == []:
-            # 인자 없으면 최근 10개 내역 검색되도록 해야함
-            SearchResult(current_account, current_userid, t)
-        else:
-            tmp = ' '.join(t)
-            tmp = tmp.strip()  # 앞뒤 공백 없앤 문자열로 다시 반환
-            SearchResult(current_account, current_userid, t)
-        '''
-    # SearchResult("394028", "id", testlist1, testlist2)

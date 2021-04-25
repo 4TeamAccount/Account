@@ -197,8 +197,7 @@ class ChangeBuilder:
         head = ['-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         mids = [',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         tail  = ['원', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        
-        
+
         if len(mo) == 1 and not mo[0] in digits:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("문자열 길이가 1이라면 그 문자는 무조건 숫자여야 함") #목업 따로 없어서 추가했습니다.
@@ -258,8 +257,7 @@ class ChangeBuilder:
     def setDate(self, date):
         d = date
         num = re.findall("\d+", d)
-    
-        
+
         if '.' in d and (d.count('-') != 0 or d.count('/')):
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.") #이게 조금 더 명확한 것 같음?
@@ -304,8 +302,7 @@ class ChangeBuilder:
         num = list(map(int, num))
         check = ['-', '/', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         #print(num)
-        
-        
+
         for k in d:
             flag = False
             for ch in check:
