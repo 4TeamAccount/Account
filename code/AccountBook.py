@@ -617,7 +617,7 @@ class Account:
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = self.account_folder + account_num + ".txt"
+        file_name = self.account_folder + "\\" + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 
@@ -849,7 +849,7 @@ class Account:
 
     def getAllUser(self, account_num):
 
-        file_name = self.account_folder + account_num + ".txt"
+        file_name = self.account_folder + "\\" + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
         file.readline()
