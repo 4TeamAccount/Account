@@ -474,13 +474,14 @@ class FileManager:
     path_dataFile=""
     user_path=""
     account_path=""
-    
+    user_txt=""
     def __init__(self):
         try:
             self.path_home=os.path.expanduser('~')
             self.path_dataFile=self.path_home+r"\Account-data"
             self.user_path=self.path_dataFile+r"\User"
             self.account_path=self.path_dataFile+r"\Account"
+            self.user_txt=self.user_path+r"\users.txt"
         except:
             print("!!! 오류: 홈경로를 파악할 수 없습니다! 프로그램을 종료합니다.")
             sys.exit()
@@ -497,6 +498,8 @@ class FileManager:
                 os.makedirs(self.user_path)
                 self.account_path=self.path_dataFile+r"\Account"
                 os.makedirs(self.account_path)
+                with open(self.user_txt,'w',encoding='ANSI'):
+                    pass
                 print("... 홈 경로에 빈 데이터 파일을 새로 생성했습니다:")
                 print(self.path_dataFile)
             except:
@@ -1062,6 +1065,7 @@ class AccountFactory:
 
 
     def selectAccount(self):
+        self.printAccount()
         select_account = input("선택할 계좌의 계좌번호를 입력해주세요 : ")
         # 선택한 계좌가 회원이 접근가능한 한지를 검사
         info, find_index = self.IDsearch()
@@ -1199,6 +1203,8 @@ if __name__ == "__main__":
         elif select_sign==2:
             account_path=userManager.signUp()
             account=Account()
+            while True:
+                CLIController.account_function()
         elif select_sign==3:
             print("종료")
             sys.exit()
