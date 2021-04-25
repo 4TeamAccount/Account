@@ -611,11 +611,13 @@ class Account:
     #파일에서 5번째 줄 읽어와 Dict 구조로 태그 목록 return
     account_file = ""
     user = ""
+    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+
 
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = account_num + ".txt"
+        file_name = self.account_folder + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 
@@ -847,7 +849,7 @@ class Account:
 
     def getAllUser(self, account_num):
 
-        file_name = account_num + ".txt"
+        file_name = self.account_folder + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
         file.readline()
