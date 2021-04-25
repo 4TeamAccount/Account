@@ -441,8 +441,12 @@ class ChangeBuilder:
                 m_res = self.setMoney(m, d[0])
             
             if m_res == 'e':
-                if not(len(d[0]) == 8 or len(d[0]) == 10):
-                    print("날짜는 ‘-’, ‘/’, ‘.’, ㅎㅎ숫자로만 써주세요.")
+                if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
+                    print(".!! 오류: 날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                    return 'e'
+                else:
+                    return 'e'
+                
                 """    
                 if d:
                     for k in d:
