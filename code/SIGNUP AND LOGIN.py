@@ -29,8 +29,8 @@ import datetime
 
 class UserManager:
 
-     user_file = os.path.expanduser('~') + "\\account-data" + "\\회원관리폴더" + "\\users.txt"
-     account_folder = os.path.expanduser('~') + "\\account-data" + "\\계좌폴더"
+     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
+     account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
 
      # ID 문법 규칙
      ID_match1 = "^(?=.*[a-z])(?=.*\d)[a-z\d]{1,}$"
