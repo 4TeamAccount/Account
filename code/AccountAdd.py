@@ -478,9 +478,6 @@ class Account:
                     temp.append(tags[i])
             tagDict[tags[0]] = temp
         return tagDict
-    
-    
-      
         
 if __name__ == '__main__':
     ch = ChangeBuilder()
