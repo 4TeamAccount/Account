@@ -1079,7 +1079,6 @@ class AccountFactory:
 
 
     def selectAccount(self):
-        self.printAccount()
         select_account = input("선택할 계좌의 계좌번호를 입력해주세요 : ")
         # 선택한 계좌가 회원이 접근가능한 한지를 검사
         info, find_index = self.IDsearch()
@@ -1091,14 +1090,33 @@ class AccountFactory:
                 break
 
         # 선택한 계좌가 회원의 계좌 목록에 실제로 있는 경우
-        if that_is_my_account == True:                  
+        if that_is_my_account == True:
             # 선택한 계좌가 실제로 있는지 확인
             account_file = self.account_folder + f"\\{select_account}.txt"
+           
             # 그러한 계좌 파일이 있을 경우
             if os.path.isfile(account_file):
-                fileManager=FileManager()
-                fileManager.accountBalanceFileCheck(account_file)
-                return True
+                # 그 계좌에 기록된 회원의 권한이 4라면, 아직 수락받지 못했기 때문에 접근 불가해야 함.
+                with open(account_file, 'r', encoding='ANSI') as file:
+                    # 회원 이름도 불러오기
+                    name = info[find_index-1].split('\t')[0]
+                     
+                    # 계좌의 권한 현황을 불러온다
+                    account_data = file.readlines()
+                    permission_list = account_data[1].rstrip().split('\t') # 추가
+                    new_request = f"{name}({self.ID})"
+
+                    # 자기 권한이 4라면
+                    for permission in permission_list:
+                        if permission[1:] == new_request:
+                            if permission[0] == '4':
+                                print("아직 관리자가 권한 요청을 수락하지 않았습니다.")
+                                return False
+                            else:
+                                # 권한이 4가 아니라면 접근 가능
+                                fileManager=FileManager()
+                                fileManager.accountBalanceFileCheck(account_file)
+                                return True
             else:
                 print("해당 계좌의 파일이 존재하지 않습니다")
                 return False
@@ -1106,6 +1124,7 @@ class AccountFactory:
         else:
             print("이용가능한 계좌 목록에 있는 계좌의 번호만 입력해주세요")
             return False
+
 
 
     def requestPermission(self):
@@ -1117,32 +1136,39 @@ class AccountFactory:
             while True:
                 answer = input("해당 계좌에 권한을 요청할까요?(y/n) : ")
                 if answer == 'y':
-                        # 해당 계좌 파일에 권한 요청을 기록
-                        with open(account_file, 'r', encoding='ANSI') as file:
-                            # 회원 이름도 같이 기록하기 위해 불러오기
-                            info, find_index = self.IDsearch()
-                            name = info[find_index-1].split('\t')[0]
+                    # 해당 계좌 파일에 권한 요청을 기록
+                    with open(account_file, 'r', encoding='ANSI') as file:
+                        # 회원 이름도 같이 기록하기 위해 불러오기
+                        info, find_index = self.IDsearch()
+                        name = info[find_index-1].split('\t')[0]
 
-                            # 계좌의 권한 현황을 불러온다
-                            account_data = file.readlines()
-                            permission_list = account_data[1].rstrip().split('\t') # 추가
-                            new_request = f"{name}({self.ID})"
+                        # 계좌의 권한 현황을 불러온다
+                        account_data = file.readlines()
+                        permission_list = account_data[1].rstrip().split('\t') # 추가
+                        new_request = f"{name}({self.ID})"
 
-                            # "이름(아이디)"가 동일한 정보가 있다면
-                            for permission in permission_list:
-                                if permission[1:] == new_request:
-                                    print("이미 권한 요청을 했거나 사용 가능한 계좌입니다.")
-                                    return
+                        # "이름(아이디)"가 동일한 정보가 있다면
+                        for permission in permission_list:
+                            if permission[1:] == new_request:
+                                print("이미 권한 요청을 했거나 사용 가능한 계좌입니다.")
+                                return
 
-                            account_data[1] = account_data[1].rstrip() + f"\t4{new_request}\n"
+                        account_data[1] = account_data[1].rstrip() + f"\t4{new_request}\n" # 추가
 
-                        with open(account_file, 'w', encoding='ANSI') as file:
-                            file.writelines(account_data)
+                        # 회원관리파일에 방금 권한 요청한 계좌번호 기록
+                        info, find_index = self.IDsearch()
+                        with open(self.user_file, 'w', encoding='ANSI') as file:
+                            info[find_index+1] = info[find_index+1][0:-1] + " " + request_account + "\n"
+                            info.insert(0, '\n') # 추가
+                            file.writelines(info)
+                                 
+                    with open(account_file, 'w', encoding='ANSI') as file:
+                        file.writelines(account_data)                           
                         return
                 elif answer == 'n':
-                        return
+                    return
                 else:
-                        print("응답은 y/n로만 가능합니다")
+                    print("응답은 y/n로만 가능합니다")
         else:
             print("해당 계좌 파일이 존재하지 않습니다.")
 
