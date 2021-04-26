@@ -1448,7 +1448,7 @@ class ChangeBuilder:
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
-        print("파일 내용 출력", lines)
+        #print("파일 내용 출력", lines)
         f_s.close()
         
         
