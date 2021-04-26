@@ -117,7 +117,7 @@ class CLIController:
                         tmp = ' '.join(t)
                         tmp = tmp.strip()
                         at = ch.setTag(tmp)
-                        if at != None:
+                        if at != 'e':
                             add_res = ch.addChange(account_num, at)
                             if add_res == 'back':
                                 pass
@@ -1349,11 +1349,10 @@ class ChangeBuilder:
         main_tag = self.main_tag
         sub_tag = self.sub_tag
         
-        """
+        
         if t[-1] == '.':
-            print("오류 체크 추가 필요")
-            return
-          """     
+            print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+            return 'e'
         
         
         if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
@@ -1362,11 +1361,11 @@ class ChangeBuilder:
             if any(x.isalpha() for x in t): #숫자와 문자 혼합
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
                 cli.printAllTag(ac.getAllTag(self.ac_num))
-                return
+                return 'e'
             
             if t.count('.') >= 2:
                 print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
-                return
+                return 'e'
             #elif not '.' in t and not 1 <= int(t) <= len(main_tag):
              #   print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
               #  return
@@ -1375,10 +1374,9 @@ class ChangeBuilder:
             if 1 <= float(t) < len(main_tag) + 0.1*len(sub_tag[-1]): #태그 목록 숫자 사이에 존재
                 if not '.' in t: #상위 태그
                     print("..! 상위태그입니다. 하위 태그를 입력해주세요")
-                    print("")
                     m_tag = main_tag[int(t)-1]
                     cli.printSomeTag(m_tag, self.main_tag, self.sub_tag)
-                    return
+                    return 'e'
                 else:
                     
                     i = list(map(int,t.split('.')))
@@ -1390,11 +1388,11 @@ class ChangeBuilder:
                     else:
                         print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
                         cli.printAllTag(ac.getAllTag(self.ac_num))
-                        return
+                        return 'e'
             else:
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
                 cli.printAllTag(ac.getAllTag(self.ac_num))
-                return
+                return 'e'
                 
         else: #입력이 문자
             if t.count('[') >= 2:
@@ -1402,26 +1400,25 @@ class ChangeBuilder:
                 return
             elif t.count('[') == 0 or t.count(']') == 0:
                 print(".!! 오류: 태그를 '[', ']'로 감싸야 합니다.")
-                return
+                return 'e'
             
             tmp = t[1:-1].strip()
         
             
             if any(x == '\n' or x == '\t' for x in t): 
                 print(".!! 오류: 태그는 탭과 개행 문자의 포함을 허용하지 않습니다.")
-                return
+                return 'e'
             
             t = ' '.join(tmp.split())
             
             if t in main_tag: #[상위태그]
                 print("..! 상위태그입니다. 하위 태그를 입력해주세요")
-                print("")
                 cli.printSomeTag(t)
                 return 
             elif not t in sum(sub_tag, []):
                 print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
                 cli.printAllTag(ac.getAllTag(self.ac_num))
-                return
+                return 'e'
             else:
                 #print("정상 입력 태그: {}" .format(t)) #확인용 지우기
                 return t
