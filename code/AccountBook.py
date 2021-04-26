@@ -40,6 +40,7 @@ class CLIController:
         for val in sub_tag[m-1]:
             print(f" ㄴ{m}.{s}  {val}")
             s += 1
+        return 'e'
 
     def printAllUser(list):
         print("=========공용 계좌 사용자 목록=============")
@@ -1709,7 +1710,7 @@ class ChangeBuilder:
             
             if m_res == 'e':
                 if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
-                    print(".!! 오류: 날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                    print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
                     self.addChange(account_num, atag)
                     return 'e'
                 else:
