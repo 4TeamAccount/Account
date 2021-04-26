@@ -1453,7 +1453,7 @@ class ChangeBuilder:
         
         days = [] #내역에서 날짜만 뽑은거
         for l in lines[5:]:
-            p = l.split(' ')[-2]
+            p = l.split(' ')[-1]
             days.append(p)
         
         i = 4
