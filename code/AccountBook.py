@@ -603,7 +603,7 @@ class UserManager:
                 f.write("\n") # 추가
                 f.write(f"1{name}({ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
-                now = datetime.datetime.now().strftime('%Y.%m.%d')
+                now = datetime.now().strftime('%Y.%m.%d')
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
 
@@ -1175,7 +1175,7 @@ class AccountFactory:
                 f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
-                now = datetime.datetime.now().strftime('%Y.%m.%d')
+                now = datetime.now().strftime('%Y.%m.%d')
 
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
@@ -1230,7 +1230,7 @@ class AccountFactory:
                 f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
-                now = datetime.datetime.now().strftime('%Y.%m.%d')
+                now = datetime.now().strftime('%Y.%m.%d')
 
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
