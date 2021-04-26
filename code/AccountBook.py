@@ -40,6 +40,7 @@ class CLIController:
         for val in sub_tag[m-1]:
             print(f" ㄴ{m}.{s}  {val}")
             s += 1
+        return 'e'
 
     def printAllUser(list):
         print("=========공용 계좌 사용자 목록=============")
