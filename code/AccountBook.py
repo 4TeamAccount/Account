@@ -7,6 +7,10 @@ import re
 import random
 import datetime
 
+tags = dict()
+main_tag = []
+sub_tag = []
+
 class CLIController:
     @staticmethod
     #Account class의 getAllTag()를 통해 가져온 dict를 출력
@@ -146,7 +150,7 @@ class CLIController:
                         break
                     else:
                         print(".!! 오류: 인자가 없어야 합니다.")
-                elif select_num=="6" or select_num=='veryfy' or select_num=='f' or select_num=='!':
+                elif select_num=="6" or select_num=='verify' or select_num=='f' or select_num=='!':
                     if t ==[]:
                         pass
                     else:
@@ -1318,15 +1322,15 @@ class ChangeBuilder:
     new_total = ''
     ac_num = ''
     change_content = []
-    account_num=""
+    
     
     def __init__(self,account_num):
-        self.account_num=account_num
+        self.ac_num=account_num
 
     
     def setTag(self, tag): #tag가 [태그] or x.x로 들어옴
         #비정상 결과: 인자가 없는 경우 -> main에서 처리
-        ac=Account(self.account_num,"")
+        ac=Account(self.ac_num,"")
         cli = CLIController()
         t = tag
         #print(f"값{t} 형태{type(t)}")
@@ -1336,7 +1340,7 @@ class ChangeBuilder:
             
             if any(x.isalpha() for x in t): #숫자와 문자 혼합
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag(self.account_num))
+                cli.printAllTag(ac.getAllTag(self.ac_num))
                 return
             
             if t.count('.') >= 2:
@@ -1367,11 +1371,11 @@ class ChangeBuilder:
 
                     else:
                         print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                        cli.printAllTag(ac.getAllTag(self.account_num))
+                        cli.printAllTag(ac.getAllTag(self.ac_num))
                         return
             else:
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag(self.account_num))
+                cli.printAllTag(ac.getAllTag(self.ac_num))
                 return
                 
         else: #입력이 문자
@@ -1398,7 +1402,7 @@ class ChangeBuilder:
                 return 
             elif not t in sum(sub_tag, []):
                 print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag(self.account_num))
+                cli.printAllTag(ac.getAllTag(self.ac_num))
                 return
             else:
                 #print("정상 입력 태그: {}" .format(t)) #확인용 지우기
@@ -1418,7 +1422,7 @@ class ChangeBuilder:
         i = 0
     
         
-        file_name = self.ac_num + ".txt"
+        file_name = self.account_folder+"\\"+self.ac_num + ".txt"
         self.account_file = file_name
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
@@ -1638,7 +1642,7 @@ class ChangeBuilder:
         else:
             self.input_tag = save_tag
             
-            file_name = self.account_folder + account_num + ".txt" #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
+            file_name = self.account_folder + "\\"+self.ac_num+ ".txt" #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
             #file_name = account_num + ".txt"
             self.account_file = file_name
             f = open(file_name, 'r+')
@@ -1670,7 +1674,7 @@ class ChangeBuilder:
         
         self.ac_num = account_num
         
-        file_name = self.account_folder + account_num + ".txt"
+        file_name = self.account_folder +"\\"+ account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r')
         lines = f.readlines()
