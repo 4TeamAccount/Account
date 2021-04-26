@@ -1,6 +1,61 @@
 import os
 
+#AccountAdd파일의 CLIController, Account와 동일합니다. (39, 42, 45번째줄 제외)
+tags = dict()
+main_tag = []
+sub_tag = []
+class CLIController:
+    @staticmethod
+    # Account class의 getAllTag()를 통해 가져온 dict를 출력
 
+    def printAllTag(dict):
+        print("======================태그 목록 출력=======================")
+        m = 1
+        s = 1
+        for key in dict.keys():
+            print(f"{m}[{key}]")
+            for val in dict[key]:
+                print(f" ㄴ{m}.{s}  {val}")
+                s += 1
+            m += 1
+            s = 1
+
+    def printSomeTag(self, m_tag):
+        print("===================[{}] 하위 태그 목록 출력====================".format(m_tag))
+        m = main_tag.index(m_tag) + 1
+        s = 1
+        print(f"{m}[{m_tag}]")
+        for val in sub_tag[m - 1]:
+            print(f" ㄴ{m}.{s}  {val}")
+            s += 1
+
+class Account:
+    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+
+    def getAllTag(self, account_num):
+        tagDict = {}
+        file_name = self.account_folder + account_num + ".txt"
+        self.account_file = file_name
+        #file = open(file_name, 'r') 절대경로로 되어있어서 안되네요 아래줄로 이 줄만 변경해서 했습니다! 합칠때 봐주세요
+        file=open('..\\' + account_num + '.txt','r')
+        #for i in range(2):  # 파일 형식 이름 한줄로 바꿔서 값 바뀐 부분1
+        for i in range(3): #저랑 파일이 다른가요...? 4번째줄이 tag목록인데... 일단 윗줄을 이렇게 바꿔서 했습니다.
+            file.readline()
+            #if i == 1:  # 바뀐 부분2
+            if i == 2: #마찬가지로 윗줄이 원본입니다.
+                l = file.readline()
+        file.close()
+        sl = l.split(" ")
+        for s in sl:
+            temp = []
+            tags = s.replace("(", " ").replace(")", "").replace("/", " ").replace("\n", "").split(" ")
+            for i in range(1, len(tags)):
+                if tags[i] != '':
+                    temp.append(tags[i])
+            tagDict[tags[0]] = temp
+        return tagDict
+
+#여기서부터 넣어주세요
 class SearchResult:
     def __init__(self, account_num, userid, search):
         self.account_num = account_num
@@ -30,7 +85,8 @@ class SearchResult:
             return
 
     def make_search_list(self, search):
-        search_list = [["2021.", "2021.02."], []]
+
+        search_list = [["2021.02", "2021.03."], []]
         # search에서 search_list[search_date_list,search_tag_list] 만들어 반환
         return search_list
 
@@ -128,14 +184,16 @@ class SearchResult:
             s = input("AccountNumber> 내역 수정> ")
             if len(s) != 0 and s != ' ':  # 공백 여러개 입력 시 예외처리...
                 c, *t = s.split()
+                t = ' '.join(t)
                 if c == 'tag':
-                    # new_change = set_tag()
+                    new_change = self.set_tag(t)
+                    print(new_change)
                     break;
                 elif c == 'date':
-                    # new_change = set_date()
+                    new_change = self.set_date(t)
                     break;
                 elif c == 'money':
-                    # new_change = set_money()
+                    new_change = self.set_money(t)
                     break;
             print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
             print("입력 예시) tag [카페]")
@@ -153,6 +211,93 @@ class SearchResult:
             self.changes[change_num] = new_change
             self.update_file()
             print("..! 수정 성공")
+
+    def set_tag(self, tag): #tag가 [태그] or x.x로 들어옴
+        #비정상 결과: 인자가 없는 경우 -> main에서 처리
+        cli = CLIController()
+        t = tag
+        #print(f"값{t} 형태{type(t)}")
+
+        if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
+            t = t.replace(' ', '')
+            if any(x.isalpha() for x in t): #숫자와 문자 혼합
+                print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                cli.printAllTag(ac.getAllTag(self.account_num))
+                return
+
+            if t.count('.') >= 2:
+                print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+                return
+            elif not '.' in t and not 1 <= int(t) <= len(main_tag):
+                print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+                return
+
+            if 1 <= float(t) < len(main_tag) + 0.1*len(sub_tag[-1]): #태그 목록 숫자 사이에 존재
+                if not '.' in t: #상위 태그
+                    print("..! 상위태그입니다. 하위 태그를 입력해주세요")
+                    print("")
+                    m_tag = main_tag[int(t)-1]
+                    cli.printSomeTag(m_tag)
+                    return
+                else:
+                    """
+                    if t[-1] == '.':
+                        print("오류 체크 추가 필요")
+                        return
+                    """
+                    i = list(map(int,t.split('.')))
+                    if i[1] <= len(sub_tag[i[0]-1]):
+                        #input_tag = t #정상 결과: 하위 숫자
+                        #print("정상 입력 숫자: {}" .format(t)) #확인용! 나중에 지우기
+                        return i
+
+                    else:
+                        print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                        cli.printAllTag(ac.getAllTag(self.account_num))
+                        return
+            else:
+                print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                cli.printAllTag(ac.getAllTag(self.account_num))
+                return
+
+        else: #입력이 문자
+            if t.count('[') >= 2:
+                print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]를 입력해야 합니다.")
+                return
+            elif t.count('[') == 0 or t.count(']') == 0:
+                print(".!! 오류: 태그를 '[', ']'로 감싸야 합니다.")
+                return
+
+            tmp = t[1:-1].strip()
+
+
+            if any(x == '\n' or x == '\t' for x in t):
+                print(".!! 오류: 태그는 탭과 개행 문자의 포함을 허용하지 않습니다.")
+                return
+
+            t = ' '.join(tmp.split())
+
+            if t in main_tag: #[상위태그]
+                print("..! 상위태그입니다. 하위 태그를 입력해주세요")
+                print("")
+                cli.printSomeTag(t)
+                return
+            elif not t in sum(sub_tag, []):
+                print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
+                cli.printAllTag(ac.getAllTag('394028'))
+                return
+            else:
+                #print("정상 입력 태그: {}" .format(t)) #확인용 지우기
+                return t
+
+
+    def set_date(self):
+        print()
+
+
+    def set_money(self):
+        print()
+
 
     def delete_change(self, change_num):
         if self.process_integrity(0, change_num) != -1:
@@ -185,9 +330,16 @@ class SearchResult:
         self.file.writelines(final_list)
         self.file.close()
 
-
 # test = 기획서 상 main에 추가해주세요
 if __name__ == '__main__':
+    #AccountAdd.py의 main부분과 동일합니다.
+    #ch = ChangeBuilder()
+    ac = Account()
+    tags = ac.getAllTag('394028')
+    main_tag = list(tags.keys())
+    sub_tag = list(tags.values())
+
+    #여기부터 넣어주세요
     current_account = "394028"
     current_userid = "id"
     c, *t = input("AccountNumber > ").split()

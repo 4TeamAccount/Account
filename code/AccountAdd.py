@@ -144,16 +144,13 @@ class ChangeBuilder:
         srh_d = srh_date
        
         i = 0
-    
-        
-        file_name = self.ac_num + ".txt"
+
+        file_name = self.account_folder + "\\" + self.ac_num + ".txt"
         self.account_file = file_name
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
         f_s.close()
-        
-        
         days = [] #내역에서 날짜만 뽑은거
         for l in lines[4:]:
             p = l.split(' ')[-2]
@@ -394,7 +391,7 @@ class ChangeBuilder:
         
         self.ac_num = account_num
         
-        file_name = self.account_folder + account_num + ".txt"
+        file_name = self.account_folder + "\\" +  account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r')
         lines = f.readlines()
@@ -467,17 +464,16 @@ class ChangeBuilder:
 class Account:
     account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
     
-    
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = self.account_folder + account_num + ".txt"
+        file_name = self.account_folder + "\\" +account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 
-        for i in range(2): #파일 형식 이름 한줄로 바꿔서 값 바뀐 부분1
+        for i in range(3): #파일 형식 이름 한줄로 바꿔서 값 바뀐 부분1
             file.readline()
-            if i == 1: #바뀐 부분2
+            if i == 2: #바뀐 부분2
                 l = file.readline()
         file.close()
         sl = l.split(" ")
