@@ -813,7 +813,7 @@ class Account:
         # print(tag_num, tag_name)
         child_num = 0
         if len(tag_name) > 20:
-            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 15글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
             self.addTag(dict)
             return 0
         if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
@@ -897,7 +897,7 @@ class Account:
             return 0
         child_num = 0
         if len(tag_name) > 20:
-            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 15글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
             self.editTag(dict)
             return 0
         if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
