@@ -851,7 +851,7 @@ class Account:
 
         except:
             print(".!!오류 : 입력 규칙을 확인하세요.")
-            self.addTag(dict)
+            self.editTag(dict)
             return 0
         child_num = 0
         if len(tag_name) > 20:
