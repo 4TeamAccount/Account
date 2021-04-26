@@ -84,8 +84,10 @@ class SearchResult:
                     # 해석 들어가기 전에 여기서 사실 문법규칙 검사 해야함.... 2021.0813이 틀렸다던가...
                     date = "".join(re.findall("\d+", v))
                     if len(date) == 8 or len(date) == 6 or len(date) == 4:
-                        # if(check_date(date)):#날짜 의미 규칙 검사
-                        if True:  # 위 함수 통과했다 가정
+                        check_date = False
+                        if (int(date) <= 20371231 and int(date)>= 19700101) or (int(date) <= 203712 and int(date) >= 197001) or (int(date) <= 2037 and int(date) >= 1970):
+                            check_date = True
+                        if check_date:  # 위 함수 통과했다 가정
                             search_list[0].append(self.insert_seporator(date))  # 구분자 삽입
                         else:
                             print("..! 날짜 의미 규칙 위배")
