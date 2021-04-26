@@ -33,7 +33,7 @@ class CLIController:
         print("===================[{}] 하위 태그 목록 출력====================" .format(m_tag))
         #ch = ChangeBuilder(ac_num)
         
-        print("메인 태그", main_tag, type(main_tag))
+        
         m = main_tag.index(m_tag) + 1
         s = 1
         print(f"{m}[{m_tag}]")
@@ -118,6 +118,7 @@ class CLIController:
                         tmp = ' '.join(t)
                         tmp = tmp.strip()
                         at = ch.setTag(tmp)
+                    
                         if at != 'e':
                             add_res = ch.addChange(account_num, at)
                             if add_res == 'back':
@@ -192,6 +193,7 @@ class CLIController:
                     else:
                         tmp = ' '.join(t)
                         tmp = tmp.strip()
+                        
                         at = ch.setTag(tmp)
                         if at != None:
                             add_res = ch.addChange(account_num, at)
@@ -1414,8 +1416,8 @@ class ChangeBuilder:
             
             if t in main_tag: #[상위태그]
                 print("..! 상위태그입니다. 하위 태그를 입력해주세요")
-                cli.printSomeTag(t)
-                return 
+                cli.printSomeTag(t, self.main_tag, self.sub_tag)
+                return 'e'
             elif not t in sum(sub_tag, []):
                 print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
                 cli.printAllTag(ac.getAllTag(self.ac_num))
@@ -1492,7 +1494,6 @@ class ChangeBuilder:
         head = ['-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         mids = [',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         tail  = ['원', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        
         
         if len(mo) == 1 and not mo[0] in digits:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
