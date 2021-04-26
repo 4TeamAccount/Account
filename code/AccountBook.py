@@ -799,14 +799,27 @@ class Account:
             tagDict[tags[0]] = temp
 #        print(tagDict)
         return tagDict
-        
-        return tagDict
 
     def addTag(self, dict):
         print("태그를 추가할 위치와 태그 이름을 입력하세요")
-        tag_num, tag_name = input().replace(']', '').split('[')
-        print(tag_num, tag_name)
+        try:
+            tag_num, tag_name = input().replace(']', '').split('[')
+
+        except:
+            print(".!!오류 : 입력 규칙을 확인하세요.")
+            self.addTag(dict)
+            return 0
+
+        # print(tag_num, tag_name)
         child_num = 0
+        if len(tag_name) > 20:
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 15글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            self.addTag(dict)
+            return 0
+        if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
+            print("특수문자 ()[]/ 은 태그 이름에 포함 될 수 없습니다.")
+            self.addTag(dict)
+            return 0
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -873,11 +886,25 @@ class Account:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
         print(new_tag)
-
     def editTag(self, dict):
         print("태그를 수정 할 위치와 태그 이름을 입력하세요")
-        tag_num, tag_name = input().replace(']', '').split('[')
+        try:
+            tag_num, tag_name = input().replace(']', '').split('[')
+
+        except:
+            print(".!!오류 : 입력 규칙을 확인하세요.")
+            self.addTag(dict)
+            return 0
         child_num = 0
+        if len(tag_name) > 20:
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 15글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            self.editTag(dict)
+            return 0
+        if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
+            print("특수문자 ()[]/ 은 태그 이름에 포함 될 수 없습니다.")
+            self.editTag(dict)
+            return 0
+        
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
