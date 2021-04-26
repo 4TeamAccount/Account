@@ -761,16 +761,12 @@ class Account:
         #             temp.append(tags[i])
         #     tagDict[tags[0]] = temp
         l = l[2:-1] #\n 제거
-        sl = l.split(']]')
-        print(sl)
+        sl = l.split(']]')  
         main_tag = sl[0: :2]
-        print(main_tag)
         sub_tag = list(map(lambda x:x.split(']'),sl[1: :2]))
-        print(sub_tag)
         for i, m in enumerate(main_tag):
             tagDict[m] = sub_tag[i][0:-1]
 
-        print(tagDict)
         return tagDict
 
     def addTag(self, dict):
