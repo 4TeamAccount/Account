@@ -44,20 +44,17 @@ class CLIController:
             elif user[0][0] == '4':
                 print(user[0][1:])
     def login_menu():
-        print("1.로그인")
-        print("2.회원가입")
-        print("3.종료")
+        print("=========로그인 메뉴 출력=============")
+        print("1.로그인\t2.회원가입\t3.종료")
         select_sign=input("AccountBook >")
         return select_sign
     def account_manage_menu():
         print("=======================계좌 메뉴 출력==========================")
-        print("1.계좌선택\t2.계좌생성\t3.권한요청")
-        
+        print("1.계좌선택\t2.계좌생성\t3.권한요청") 
         select_account=input("AccountNumber >")
         return select_account
     
     def manager_menu():
-        print("1.수입지출 추가\n2.검색 및 수정\n3.태그편집\n4.권한이동\n5.계좌관리\n6.파일 무결성 체크\n7.종료")
         c,*t=input("AccountNumber >").split()
         return c,t
     def tag_menu():
@@ -112,8 +109,6 @@ class CLIController:
                 
                 elif select_num=="2":
                     print("수입지출추가부입니다.")
-                
-                    
                 elif select_num=="3" or select_num=='tag' or select_num=='t' or select_num=='[':
                     while True:
                         CLIController.printAllTag(a.getAllTag(account_num))
@@ -164,20 +159,59 @@ class CLIController:
 
 
             elif userType=="2":
-                print("2.검색\n5.계좌관리\n7.종료")
-                select_num=int(input("숫자를 입력하세요:"))
+                select_num,t=CLIController.manager_menu()
+                if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
+                    ch = ChangeBuilder(account_num)
+                    tags = a.getAllTag(account_num)
+                    main_tag = list(tags.keys())
+                    sub_tag = list(tags.values())
+                    if t == []:
+                        print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
+                        print("")
+                        CLIController.printAllTag(a.getAllTag(account_num))
+                    else:
+                        tmp = ' '.join(t)
+                        tmp = tmp.strip()
+                        at = ch.setTag(tmp)
+                        if at != None:
+                            add_res = ch.addChange(account_num, at)
+                            if add_res == 'back':
+                                pass
+                elif select_num=="5" or select_num=='manage' or select_num=='m' or select_num=='>':
+                    if t ==[]:
+                        break
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                elif select_num=="7" or select_num=='quit' or select_num=='q' or select_num=='.':
+                    if t ==[]:
+                        sys.exit()
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                else:
+                    CLIController.printCommend()
+                
+            elif userType=="3":
+                select_num,t=CLIController.manager_menu()
                 if select_num==2:
                     print("검색 및 수정부입니다")
-                elif select_num==5:
-                    print("계좌관리부입니다")
-                elif select_num==7:
-                    sys.exit()
-            elif userType=="3":
-                sys.exit()
+                elif select_num=="5" or select_num=='manage' or select_num=='m' or select_num=='>':
+                    if t ==[]:
+                        break
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                elif select_num=="7" or select_num=='quit' or select_num=='q' or select_num=='.':
+                    if t ==[]:
+                        sys.exit()
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
+                else:
+                    CLIController.printCommend()
             elif userType=="4":
-                print("미지정")
+                print("..! 오류: 아직 계좌에 대한 권한이 없습니다")
+                break
             else:
-                print("오류")
+                print("!!! 경고: 사용자 권한에 오류가 있습니다 프로그램을 종료합니다.")
+                sys.exit()
 class UserManager:
 
     user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
@@ -550,7 +584,7 @@ class UserManager:
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
 
-                return UserManager.account_folder + f"\\{new_account_num}.txt"
+                return ID,new_account_num
 class FileManager:
     path_home=""
     path_dataFile=""
@@ -1755,26 +1789,41 @@ if __name__ == "__main__":
                 if select_account=="1":
                     account_num=accountFactory.selectAccount()
                     if account_num!=False:
-                            CLIController.account_function(ID,account_num)
+                        CLIController.account_function(ID,account_num)
                 elif select_account=="2":
                     accountFactory.createAccount()
                     
                 elif select_account=="3":
                     accountFactory.requestPermission()
-                elif select_account=="manage":
-                    pass
-                elif not select_account.find("manage")==-1 and not select_account=="manage":
-                    print(".!! 오류: 인자가 없어야 합니다.")
+                else:
+                    print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
 
             
         elif select_sign=="2":
-            account_path=userManager.signUp()
-            account=Account()
+            ID,account_num=userManager.signUp()
+            first_check=0
+            while True:
+                if first_check==0:
+                    CLIController.account_function(ID,account_num)
+                    first_check=1
+                else:
+                    accountFactory.printAccount()
+                    select_account=CLIController.account_manage_menu()
+                    if select_account=="1":
+                        account_num=accountFactory.selectAccount()
+                        if account_num!=False:
+                            CLIController.account_function(ID,account_num)
+                    elif select_account=="2":
+                        accountFactory.createAccount()
+                    elif select_account=="3":
+                        accountFactory.requestPermission()
+                    else:
+                        print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
             
         elif select_sign=="3":
             print("종료")
             sys.exit()
             break
         else:
-            print("올바른 인자를 입력해주세요")
+            print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
 
