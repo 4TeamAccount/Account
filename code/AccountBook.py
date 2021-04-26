@@ -6,6 +6,8 @@ import os.path
 import re
 import random
 import datetime
+from datetime import datetime
+import datetime as dt
 
 #tags = dict()
 #main_tag = []
@@ -1435,12 +1437,12 @@ class ChangeBuilder:
        
         i = 0
     
-        
         file_name = self.account_folder+"\\"+self.ac_num + ".txt"
         self.account_file = file_name
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
+        print("파일 내용 출력", lines)
         f_s.close()
         
         
@@ -1518,6 +1520,11 @@ class ChangeBuilder:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
+        
+        
+      
+    def balance(self, money, *date):
+        mo = money
         
         if date != ():
             da = date[0]
@@ -1727,10 +1734,13 @@ class ChangeBuilder:
             self.addChange(account_num, atag)
         else:
             #print("d형태", d[0])
+            m_res = self.setMoney(m)
+            """
             if len(d) == 0:    
                 m_res = self.setMoney(m)
             else:
                 m_res = self.setMoney(m, d[0])
+            """
             
             if m_res == 'e':
                 if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
@@ -1749,8 +1759,36 @@ class ChangeBuilder:
                 """
                 self.addChange(account_num, atag)
                 
-          
             else:
+                if d != []: #날짜 입력된 경우
+                    da = d[0]
+                    print("확인", da)
+                    res_d = self.setDate(da)
+                    
+                    if res_d != 'e': #숫자 입력 규칙 만족 후 잔고 비교
+                        print("금액 비교하러 출동")
+                        s = self.search(res_d, m)
+                        if  s != 'e':
+                            print("인덱스 보자", s)
+                            print("금액 가능!")
+                            self.input_date = res_d
+                            return s
+                        else:
+                            print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                            return 'e'
+                    else:
+                        return 'e'
+                else: #날짜 입력 안된 경우 잔고 비교
+                    res_d = datetime.today().strftime("%Y.%m.%d")
+                    self.input_date = res_d
+                    s = self.search(res_d, m)
+                    if s != 'e':
+                        return s
+                    else:
+                        print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                        return 'e'
+                
+                
                 save_res = self.build(account_num, t, m_res)
                 if save_res == 'back':
                     print("주 프롬프트 출력해야함!")
