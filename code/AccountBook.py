@@ -1687,6 +1687,7 @@ class ChangeBuilder:
                     self.addChange(account_num, atag)
         
         if len(d) >= 2:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
             self.addChange(account_num, atag)
         else:
