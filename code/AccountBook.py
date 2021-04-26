@@ -309,7 +309,7 @@ class UserManager:
 
             # 이름 문법 규칙 : 길이 >=1, 첫/마지막은 실상 문자, 탭/개행 X
             if not (len(name)>=1 and (name[0].isprintable() and not name[0].isspace() and name[-1].isprintable()
-                                        and not name[-1].isspace()) and not any(ch in name for ch in [u'\u0009', u'\u000A', u'\u000D'])):
+                                        and not name[-1].isspace()) and not any(ch in [u'\u0009', u'\u000A', u'\u000D'] for ch in name)):
                 print("잘못된 이름입니다. 다시 입력해주세요")
                 continue
 
@@ -752,14 +752,21 @@ class Account:
             if i == 2:
                 l = file.readline()
         file.close()
-        sl = l[:-1].split(") ")
-        for s in sl:
-            temp = []
-            tags = s.replace("(", "/").replace(")", "").split("/")
-            for i in range(1, len(tags)):
-                if tags[i] != '':
-                    temp.append(tags[i])
-            tagDict[tags[0]] = temp
+        # sl = l[:-1].split(") ")
+        # for s in sl:
+        #     temp = []
+        #     tags = s.replace("(", "/").replace(")", "").split("/")
+        #     for i in range(1, len(tags)):
+        #         if tags[i] != '':
+        #             temp.append(tags[i])
+        #     tagDict[tags[0]] = temp
+        l = l[2:-1] #\n 제거
+        sl = l.split(']]')  
+        main_tag = sl[0: :2]
+        sub_tag = list(map(lambda x:x.split(']'),sl[1: :2]))
+        for i, m in enumerate(main_tag):
+            tagDict[m] = sub_tag[i][0:-1]
+
         return tagDict
 
     def addTag(self, dict):
@@ -772,15 +779,12 @@ class Account:
             self.addTag(dict)
             return 0
 
+        # print(tag_num, tag_name)
         child_num = 0
         if len(tag_name) > 20:
             print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
-            self.addTag(dict)
-            return 0
-        if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
-            print("특수문자 ()[]/ 은 태그 이름에 포함 될 수 없습니다.")
-            self.addTag(dict)
-            return 0
+        if ']' in tag_name:
+            print("] 기호는 태그 이름에 포함될 수 없습니다.")
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -795,6 +799,7 @@ class Account:
                 dict[key] = []
             if temp == super_num:
                 if len(dict[key]) >= child_num:
+                    print(child_num, len(dict[key]), dict[key])
                     print(".!!오류 : 해당 위치에 태그가 이미 존재 합니다.")
                     self.addTag(dict)
                     return 0
@@ -809,11 +814,9 @@ class Account:
                     self.addTag(dict)
                     return 0
             temp += 1
-        if ' ' in tag_name or '\t' in tag_name:
-            print(".!!오류 : 태그 이름에는 탭이나 개행 문자가 포함될 수 없습니다.")
-            self.addTag(dict)
-            return 0
+     
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
+        print(super_num, child_num)
         if child_num != 0:
             temp = 0
             for key in dict.keys():
@@ -823,46 +826,34 @@ class Account:
                     break
         else:
             dict[tag_name] = []
+        print(dict)
         new_tag = ""
 
         for key in dict.keys():
-            new_tag += key + '('
+            new_tag += ']]'+ key + ']]'
             temp = 1
-            if len(dict[key]) == 0:
-                new_tag += ')'
             for val in dict[key]:
-                if temp == len(dict[key]):
-                    new_tag += val + ')'
-                else:
-                    new_tag += val + '/'
+                new_tag += val + ']'
                 temp += 1
-            new_tag += " "
+            new_tag += ' '
         new_tag = new_tag[:-1]
         new_tag += '\n'
         for line in fileinput.input(self.account_file, inplace=True):
-            if '(' in line and '/' in line and ')' in line:
+            if ']]' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
+        print(new_tag)
 
     def editTag(self, dict):
         print("태그를 수정 할 위치와 태그 이름을 입력하세요")
-        try:
-            tag_num, tag_name = input().replace(']', '').split('[')
-
-        except:
-            print(".!!오류 : 입력 규칙을 확인하세요.")
-            self.addTag(dict)
-            return 0
+        tag_num, tag_name = input().replace(']', '').split('[')
         child_num = 0
         if len(tag_name) > 20:
             print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+        if ']' in tag_name:
+            print("] 기호는 태그 이름에 포함될 수 없습니다.")
             self.editTag(dict)
-            return 0
-        if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
-            print("특수문자 ()[]/ 은 태그 이름에 포함 될 수 없습니다.")
-            self.editTag(dict)
-            return 0
-        
+            return
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -893,10 +884,7 @@ class Account:
                     return 0
                     break
             temp += 1
-        if ' ' in tag_name or '\t' in tag_name:
-            print(".!!오류 : 태그 이름에는 탭이나 개행 문자가 포함될 수 없습니다.")
-            self.editTag(dict)
-            return 0
+    
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
         if child_num != 0:
             dict[list(dict.keys())[super_num-1]][child_num-1] = tag_name
@@ -909,28 +897,26 @@ class Account:
             for keys in new_keys:
                 new_dict[keys] = dict[list(dict.keys())[temp]]
                 temp += 1
+        print(new_dict)
         new_tag = ""
 
-        for key in new_dict.keys():
-            new_tag += key + '('
+        for key in dict.keys():
+            new_tag += ']]' + key + ']]'
             temp = 1
-            if len(new_dict[key]) == 0:
-                new_tag += ')'
-            for val in new_dict[key]:
-                if temp == len(new_dict[key]):
-                    new_tag += val + ')'
-                else:
-                    new_tag += val + '/'
+            for val in dict[key]:
+                new_tag += val + ']'
                 temp += 1
-            new_tag += " "
+            new_tag += ' '
         new_tag = new_tag[:-1]
         new_tag += '\n'
         for line in fileinput.input(self.account_file, inplace=True):
-            if '(' in line and '/' in line and ')' in line:
+            if ']]' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
+        print(new_tag)
 
     def deleteTag(self, dict):
+        print(dict)
         print("삭제할 태그 위치를 입력하세요")
         tag_num = input()
         for c in tag_num:
@@ -956,6 +942,7 @@ class Account:
         #하위태그는 입력 안했을때
         if child_num == 0:
             #삭제하려는 태그의 하위태그가 존재할때
+            print(super_num, child_num)
             if len(dict[list(dict.keys())[super_num-1]]) != 0:
                 print(".!!오류 : 해당 위치에 태그에 하위 태그들이 존재하면 삭제 할 수 없습니다.")
                 self.deleteTag(dict)
@@ -974,24 +961,20 @@ class Account:
         new_tag = ""
 
         for key in dict.keys():
-            new_tag += key + '('
+            new_tag += ']]' + key + ']]'
             temp = 1
-            if len(dict[key]) == 0:
-                new_tag += ')'
             for val in dict[key]:
-                if temp == len(dict[key]):
-                    new_tag += val + ')'
-                else:
-                    new_tag += val + '/'
+                new_tag += val + ']'
                 temp += 1
-            new_tag += " "
+            new_tag += ' '
         new_tag = new_tag[:-1]
         new_tag += '\n'
         for line in fileinput.input(self.account_file, inplace=True):
-            if '(' in line and '/' in line and ')' in line:
+            if ']]' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
         print("...태그 삭제가 완료되었습니다.")
+        print(new_tag)
 
     def getAllUser(self, account_num):
 
@@ -1162,7 +1145,7 @@ class AccountFactory:
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
 
-                f.write(f"[계좌 생성] +{balance} {now} {balance}")
+                f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
                 f.close()
         else:
             print("!!! 오류:계좌 생성에 실패하였습니다. 프로그램을 종료합니다.")
@@ -1217,7 +1200,7 @@ class AccountFactory:
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
 
-                f.write(f"[계좌 생성] +{balance} {now} {balance}")
+                f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
                 f.close()
         else:
             print("ID를 찾지 못했습니다")
