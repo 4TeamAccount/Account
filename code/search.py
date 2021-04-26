@@ -1,11 +1,15 @@
 import os
+import re
+
 import AccountBook
 
-#여기서부터 넣어주세요
+
+# 여기서부터 넣어주세요
 class SearchResult:
     def __init__(self, account_num, userid, search):
         self.account_num = account_num
-        self.filepath = '..\\' + account_num + '.txt' #테스트때문에 실행중인 .py 파일 기준으로 상대경로로 해뒀는데 합치실 때 홈경로로 수정부탁드립니다!
+        self.userid = userid
+        self.filepath = '..\\' + account_num + '.txt'  # 테스트때문에 실행중인 .py 파일 기준으로 상대경로로 해뒀는데 합치실 때 홈경로로 수정부탁드립니다!
         self.file = open(self.filepath, 'r', encoding='ANSI')
         self.backup = []
         for i in range(5):
@@ -21,11 +25,12 @@ class SearchResult:
             d = change.split(' ')[-2]
             self.days.append(d)
         # run
-        print(search)
-        search_list=self.make_search_list(search)
+        search_list = self.make_search_list(search)
         if search_list is not None:
             match_list = self.search_change(search_list)
-            if self.usertype == 1 or self.usertype == 2:
+            if len(match_list) == 0:
+                print("검색결과가 없습니다.")
+            elif self.usertype == 1 or self.usertype == 2:
                 select_change = self.select_change(match_list)
                 if select_change is not None:
                     self.after_find_menu(select_change)
@@ -34,43 +39,53 @@ class SearchResult:
             return
 
     def insert_seporator(self, date):
-        print("")
+        if len(date) == 8:
+            return date[:4] + '.' + date[4:6] + '.' + date[6:] + '.'
+        elif len(date) == 6:
+            return date[:4] + '.' + date[4:] + '.'
+        else:
+            return date + '.'
 
     def make_search_list(self, search):
-        '''search_list = [[], []]
-        if len(search)>0:
-            while i<len(search):
-                i=0
-                v=search[i]
-                if v[0].isdigit():
-                    if len(search_list[0])>=2:
-                        print("..! 날짜는 2개까지만 입력할 수 있습니다.")
-                        return
-                    else:
-                        #구분자 삭제
-                        if len(v)==8 or len(v)==6 or len(v)==4:
-                            if(check_date(v)):#날짜 의미 규칙 검사
-                                search_list[0].append(self.insert_seporator(v)) #구분자 삽입
-                            else:
-                                print("..! 날짜 의미 규칙 위배")
-                                return
-                        else:
-                            print("..! 날짜는 구분자를 제외하고 셌을 때 4자리(연도만 입력), 6자리(연, 월만 입력), 8자리(연, 월, 일 입력)로만 검색 가능합니다.")
-                            return
-
-                elif v[0]=='[':
-                    for j in range(i, len(search)):
-                        if v[-1]==']':
-                            end=i
-                    #end = search에서 최초로 ]로 끝나는 v 인덱스 -> 다음 for에서 그 다음부터 돌도록...
-                    search_tag=' ' #i, end까지 합쳐서 하나의 문자열 만들기
-                    if(check_tag(search_tag)):#만든 문자열에 대해 태그 의미 규칙 검사
-                        search_list[1].append(search_tag)
-                else:
-                    print("..! 오류: 태그를 '[', ']'로 감싸야 합니다.")
+        search_list = [[], []]
+        tmp = ""
+        for v in search:
+            if (len(tmp) == 0 and v[0] == '[') or (v[-1] != ']' and len(tmp) != 0):
+                tmp = tmp + ' ' + v
+                if v[-1] == ']':
+                    tag = tmp.strip()
+                    search_list[1].append(tag)
+                    tmp = ""
+            elif v[-1] == ']' and len(tmp) != 0:
+                tmp = tmp + ' ' + v
+                tag = tmp.strip()
+                search_list[1].append(tag)
+                tmp = ""
+            elif len(tmp) == 0 and v[0].isdigit():
+                if len(search_list[0]) >= 2:
+                    print("..! 날짜는 2개까지만 입력할 수 있습니다.")
                     return
-                i += 1'''
-        search_list = [["2021.02", "2021.03."], []]
+                else:
+                    # 해석 들어가기 전에 여기서 사실 문법규칙 검사 해야함.... 2021.0813이 틀렸다던가...
+                    date = "".join(re.findall("\d+", v))
+                    if len(date) == 8 or len(date) == 6 or len(date) == 4:
+                        # if(check_date(date)):#날짜 의미 규칙 검사
+                        if True:  # 위 함수 통과했다 가정
+                            search_list[0].append(self.insert_seporator(date))  # 구분자 삽입
+                        else:
+                            print("..! 날짜 의미 규칙 위배")
+                            return
+                    else:
+                        print("..! 날짜는 구분자를 제외하고 셌을 때 4자리(연도만 입력), 6자리(연, 월만 입력), 8자리(연, 월, 일 입력)로만 검색 가능합니다.")
+                        return
+            else:
+                print("..! 오류: 태그를 '[', ']'로 감싸야 합니다.")
+                return
+        if 0 != len(tmp):
+            print("..! 오류: 태그를 '[', ']'로 감싸야 합니다.")
+            return
+
+        # search_list = [["2021.02", "2021.03."], ["[식사]"]] #테스트용
         # search에서 search_list[search_date_list,search_tag_list] 만들어 반환
         return search_list
 
@@ -93,7 +108,7 @@ class SearchResult:
         elif len(search_date_list) == 2:
             search_date_list.sort()
             start = -1
-            end = len(self.days) - 1
+            end = len(self.days)
 
             if len(search_date_list[1]) < 8:
                 search_date_list[1] += "12.31."
@@ -106,9 +121,9 @@ class SearchResult:
                         start = i
                 else:
                     if search_date_list[1] < day:
-                        end = i - 1
-                        break;
-            for i in range(start, end + 1):
+                        end = i
+                        break
+            for i in range(start, end):
                 date_match_set.add(i)
 
         for k in search_tag_list:
@@ -184,31 +199,36 @@ class SearchResult:
                 print("          date 2021.01.02")
                 print("          moeny -1000원")
                 continue
+            change_builder = AccountBook.ChangeBuilder(self.account_num)
             if c == 'tag':
-                tag = AccountBook.ChangeBuilder.setTag(t)
+                a = AccountBook.Account(self.account_num, self.userid)
+                change_builder.tags = a.getAllTag(self.account_num)
+                change_builder.main_tag = list(change_builder.tags.keys())
+                change_builder.sub_tag = list(change_builder.tags.values())
+                tag = change_builder.setTag(t)
                 print(tag)
                 if tag != 'e':
-                    new_change=" " #tag 넣은 새 내역 문자열
-                    break;
+                    new_change = " "  # tag 넣은 새 내역 문자열
+                    break
             elif c == 'date':
-                date = AccountBook.ChangeBuilder.setDate(t)
+                date = change_builder.setDate(t)
                 print(date)
                 if date != 'e':
                     new_change = " "  # date 넣은 새 내역 문자열
-                    break;
+                    break
             elif c == 'money':
-                money = AccountBook.ChangeBuilder.setMoney(t)
+                money = change_builder.setMoney(t)
                 print(money)
                 if money != 'e':
                     new_change = " "  # money 넣은 새 내역 문자열
-                    break;
+                    break
             else:
                 print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
                 print("입력 예시) tag [카페]")
                 print("          date 2021.01.02")
                 print("          moeny -1000원")
 
-        #new_change = "[음식][식사] -2000 2021.01.25 13000\n" #임시 테스트용(new_change생성 전 수정기능 테스트)
+        # new_change = "[음식][식사] -2000 2021.01.25 13000\n" #임시 테스트용(new_change생성 전 수정기능 테스트)
         print("수정된 내역: ", " ".join(new_change.split()[:-1]))
         confirm = input("AccountNumber> 정말 수정하시겠습니까? (.../No) > ")
         if confirm == "No":
@@ -218,15 +238,6 @@ class SearchResult:
             self.changes[change_num] = new_change
             self.update_file()
             print("..! 수정 성공")
-
-    def set_tag(self, tag):
-        print()
-
-    def set_date(self):
-        print()
-
-    def set_money(self):
-        print()
 
     def delete_change(self, change_num):
         if self.process_integrity(0, change_num) != -1:
@@ -258,6 +269,7 @@ class SearchResult:
         self.file.seek(0)
         self.file.writelines(final_list)
         self.file.close()
+
 
 # test = 기획서 상 main에 추가해주세요
 if __name__ == '__main__':
