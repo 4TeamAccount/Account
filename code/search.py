@@ -35,11 +35,17 @@ class SearchResult:
             return
 
     def insert_seporator(self, date):
-        print("")
+        if len(date)==8:
+            tmp = [date[:4], date[4:6], date[6:]]
+        elif len(date)==6:
+            tmp = [date[:4], date[4:]]
+            return ".".join(tmp)
+
 
     def make_search_list(self, search):
         search_list = [[], []]
-        '''if len(search)>0:
+        if len(search)>0:
+
             while i<len(search):
                 i=0
                 v=search[i]
@@ -64,6 +70,7 @@ class SearchResult:
                     for j in range(i, len(search)):
                         if v[-1]==']':
                             end=i
+
                     #end = search에서 최초로 ]로 끝나는 v 인덱스 -> 다음 for에서 그 다음부터 돌도록...
                     search_tag=' ' #i, end까지 합쳐서 하나의 문자열 만들기
                     if(check_tag(search_tag)):#만든 문자열에 대해 태그 의미 규칙 검사
@@ -71,7 +78,7 @@ class SearchResult:
                 else:
                     print("..! 오류: 태그를 '[', ']'로 감싸야 합니다.")
                     return
-                i += 1'''
+                i += 1
         search_list = [["2021.02", "2021.03."], []]
         # search에서 search_list[search_date_list,search_tag_list] 만들어 반환
         return search_list
