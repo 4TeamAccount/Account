@@ -5,6 +5,7 @@ import AccountBook
 class SearchResult:
     def __init__(self, account_num, userid, search):
         self.account_num = account_num
+        self.userid=userid
         self.filepath = '..\\' + account_num + '.txt' #테스트때문에 실행중인 .py 파일 기준으로 상대경로로 해뒀는데 합치실 때 홈경로로 수정부탁드립니다!
         self.file = open(self.filepath, 'r', encoding='ANSI')
         self.backup = []
@@ -37,8 +38,8 @@ class SearchResult:
         print("")
 
     def make_search_list(self, search):
-        '''search_list = [[], []]
-        if len(search)>0:
+        search_list = [[], []]
+        '''if len(search)>0:
             while i<len(search):
                 i=0
                 v=search[i]
@@ -107,7 +108,7 @@ class SearchResult:
                 else:
                     if search_date_list[1] < day:
                         end = i - 1
-                        break;
+                        break
             for i in range(start, end + 1):
                 date_match_set.add(i)
 
@@ -184,24 +185,29 @@ class SearchResult:
                 print("          date 2021.01.02")
                 print("          moeny -1000원")
                 continue
+            change_builder = AccountBook.ChangeBuilder(self.account_num)
             if c == 'tag':
-                tag = AccountBook.ChangeBuilder.setTag(t)
+                a= AccountBook.Account(self.account_num, self.userid)
+                change_builder.tags = a.getAllTag(self.account_num)
+                change_builder.main_tag = list(change_builder.tags.keys())
+                change_builder.sub_tag = list(change_builder.tags.values())
+                tag = change_builder.setTag(t)
                 print(tag)
                 if tag != 'e':
                     new_change=" " #tag 넣은 새 내역 문자열
-                    break;
+                    break
             elif c == 'date':
-                date = AccountBook.ChangeBuilder.setDate(t)
+                date = change_builder.setDate(t)
                 print(date)
                 if date != 'e':
                     new_change = " "  # date 넣은 새 내역 문자열
-                    break;
+                    break
             elif c == 'money':
-                money = AccountBook.ChangeBuilder.setMoney(t)
+                money = change_builder.setMoney(t)
                 print(money)
                 if money != 'e':
                     new_change = " "  # money 넣은 새 내역 문자열
-                    break;
+                    break
             else:
                 print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
                 print("입력 예시) tag [카페]")
@@ -218,15 +224,6 @@ class SearchResult:
             self.changes[change_num] = new_change
             self.update_file()
             print("..! 수정 성공")
-
-    def set_tag(self, tag):
-        print()
-
-    def set_date(self):
-        print()
-
-    def set_money(self):
-        print()
 
     def delete_change(self, change_num):
         if self.process_integrity(0, change_num) != -1:
