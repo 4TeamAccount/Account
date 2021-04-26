@@ -7,9 +7,9 @@ import re
 import random
 import datetime
 
-tags = dict()
-main_tag = []
-sub_tag = []
+#tags = dict()
+#main_tag = []
+#sub_tag = []
 
 class CLIController:
     @staticmethod
@@ -27,8 +27,11 @@ class CLIController:
                 s += 1
             m += 1
             s = 1
-    def printSomeTag(self, m_tag):
+    def printSomeTag(self, m_tag, main_tag, sub_tag):
         print("===================[{}] 하위 태그 목록 출력====================" .format(m_tag))
+        #ch = ChangeBuilder(ac_num)
+        
+        print("메인 태그", main_tag, type(main_tag))
         m = main_tag.index(m_tag) + 1
         s = 1
         print(f"{m}[{m_tag}]")
@@ -99,9 +102,11 @@ class CLIController:
                     continue
                 if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
                     ch = ChangeBuilder(account_num)
-                    tags = a.getAllTag(account_num)
-                    main_tag = list(tags.keys())
-                    sub_tag = list(tags.values())
+                    ch.tags = a.getAllTag(account_num)
+                    ch.main_tag = list(ch.tags.keys())
+                    ch.sub_tag = list(ch.tags.values())
+                    
+                    
                     if t == []:
                         print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
                         print("")
@@ -174,9 +179,9 @@ class CLIController:
                     continue
                 if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
                     ch = ChangeBuilder(account_num)
-                    tags = a.getAllTag(account_num)
-                    main_tag = list(tags.keys())
-                    sub_tag = list(tags.values())
+                    ch.self.tags = a.getAllTag(account_num)
+                    ch.self.main_tag = list(ch.self.tags.keys())
+                    ch.self.sub_tag = list(ch.self.tags.values())
                     if t == []:
                         print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
                         print("")
@@ -1308,10 +1313,12 @@ user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt
 account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
 
 
-tags = dict()
-main_tag = []
-sub_tag = []
+#tags = dict()
+#main_tag = []
+#sub_tag = []
 class ChangeBuilder:
+    
+    
     
     account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
     
@@ -1326,6 +1333,9 @@ class ChangeBuilder:
     
     def __init__(self,account_num):
         self.ac_num=account_num
+        self.tags = dict()
+        self.main_tag = []
+        self.sub_tag = []
 
     
     def setTag(self, tag): #tag가 [태그] or x.x로 들어옴
@@ -1334,6 +1344,9 @@ class ChangeBuilder:
         cli = CLIController()
         t = tag
         #print(f"값{t} 형태{type(t)}")
+        main_tag = self.main_tag
+        sub_tag = self.sub_tag
+        
         
         if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
             t = t.replace(' ', '')
@@ -1346,16 +1359,17 @@ class ChangeBuilder:
             if t.count('.') >= 2:
                 print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
                 return
-            elif not '.' in t and not 1 <= int(t) <= len(main_tag):
-                print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
-                return
-                
+            #elif not '.' in t and not 1 <= int(t) <= len(main_tag):
+             #   print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+              #  return
+        
+            
             if 1 <= float(t) < len(main_tag) + 0.1*len(sub_tag[-1]): #태그 목록 숫자 사이에 존재
                 if not '.' in t: #상위 태그
                     print("..! 상위태그입니다. 하위 태그를 입력해주세요")
                     print("")
                     m_tag = main_tag[int(t)-1]
-                    cli.printSomeTag(m_tag)
+                    cli.printSomeTag(m_tag, self.main_tag, self.sub_tag)
                     return
                 else:
                     """
@@ -1673,6 +1687,7 @@ class ChangeBuilder:
         d = ''
         
         self.ac_num = account_num
+        main_tag = self.main_tag
         
         file_name = self.account_folder +"\\"+ account_num + ".txt"
         self.account_file = file_name
@@ -1680,13 +1695,14 @@ class ChangeBuilder:
         lines = f.readlines()
         self.total = lines[-1].split(' ')[3]
         
+        at = atag
         f.close()
-        
+    
         
         if type(atag) == list:
                 try:
-                    m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split( ))
-                    t = f"[{main_tag[at[0]-1]}][{sub_tag[at[0]-1][at[1]-1]}]"
+                    m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(self.main_tag[at[0]-1], self.sub_tag[at[0]-1][at[1]-1])).split(" "))
+                    t = f"[{self.main_tag[at[0]-1]}][{self.sub_tag[at[0]-1][at[1]-1]}]"
                     
                 except ValueError:
                     print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
@@ -1694,7 +1710,7 @@ class ChangeBuilder:
                     self.addChange(account_num, atag)
         elif type(atag) == str:
             main_key = ''
-            for key, value in tags.items():
+            for key, value in self.tags.items():
                 if at in value:
                     main_key = key
                     break
