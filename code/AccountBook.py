@@ -127,25 +127,27 @@ class CLIController:
                 elif select_num=="2":
                     print("검색 및 수정부입니다")
                 elif select_num=="3" or select_num=='tag' or select_num=='t' or select_num=='[':
-                    while True:
-                        CLIController.printAllTag(a.getAllTag(account_num))
-                        print("..! 원하시는 기능을 입력하세요.(숫자 하나)")
-                        print("\t1.태그 추가\t2.태그 수정\t3.태그삭제")
-                        select=input("AccountNumber >")
-                    
-                        if select=="1":
-                            a.addTag(a.getAllTag(account_num))
-                            break
-                        elif select=="2":
-                            a.editTag(a.getAllTag(account_num))
-                            break
-                        elif select=="3":
-                            a.deleteTag(a.getAllTag(account_num))
-                            break
-                        else:
-                            print("..! 오류:1~3중의 숫자만 입력해주세요")
-                            break
-
+                    if t ==[]:
+                        while True:
+                            CLIController.printAllTag(a.getAllTag(account_num))
+                            print("..! 원하시는 기능을 입력하세요.(숫자 하나)")
+                            print("\t1.태그 추가\t2.태그 수정\t3.태그삭제")
+                            select=input("AccountNumber >")
+                        
+                            if select=="1":
+                                a.addTag(a.getAllTag(account_num))
+                                break
+                            elif select=="2":
+                                a.editTag(a.getAllTag(account_num))
+                                break
+                            elif select=="3":
+                                a.deleteTag(a.getAllTag(account_num))
+                                break
+                            else:
+                                print("..! 오류:1~3중의 숫자만 입력해주세요")
+                                break
+                    else:
+                        print(".!! 오류: 인자가 없어야 합니다.")
                     
                 elif select_num=="4" or select_num=='permission' or select_num=='p' or select_num=='@':
                     if t ==[]:
@@ -816,7 +818,6 @@ class Account:
             temp += 1
      
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
-        print(super_num, child_num)
         if child_num != 0:
             temp = 0
             for key in dict.keys():
@@ -826,7 +827,6 @@ class Account:
                     break
         else:
             dict[tag_name] = []
-        print(dict)
         new_tag = ""
 
         for key in dict.keys():
@@ -842,11 +842,16 @@ class Account:
             if ']]' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
-        print(new_tag)
 
     def editTag(self, dict):
         print("태그를 수정 할 위치와 태그 이름을 입력하세요")
-        tag_num, tag_name = input().replace(']', '').split('[')
+        try:
+            tag_num, tag_name = input().replace(']', '').split('[')
+
+        except:
+            print(".!!오류 : 입력 규칙을 확인하세요.")
+            self.eidtTag(dict)
+            return 0
         child_num = 0
         if len(tag_name) > 20:
             print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
@@ -868,7 +873,6 @@ class Account:
                 dict[key] = []
             if temp == super_num:
                 if len(dict[key]) < child_num:
-                    print(child_num, len(dict[key]), dict[key])
                     print(".!!오류 : 해당 위치에 태그가 존재하지 않습니다.")
                     self.editTag(dict)
                     return 0
@@ -897,7 +901,6 @@ class Account:
             for keys in new_keys:
                 new_dict[keys] = dict[list(dict.keys())[temp]]
                 temp += 1
-        print(new_dict)
         new_tag = ""
 
         for key in new_dict.keys():
@@ -913,10 +916,8 @@ class Account:
             if ']]' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
-        print(new_tag)
 
     def deleteTag(self, dict):
-        print(dict)
         print("삭제할 태그 위치를 입력하세요")
         tag_num = input()
         for c in tag_num:
@@ -974,7 +975,6 @@ class Account:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
         print("...태그 삭제가 완료되었습니다.")
-        print(new_tag)
 
     def getAllUser(self, account_num):
 
@@ -1207,7 +1207,6 @@ class AccountFactory:
 
 
     def selectAccount(self):
-        self.printAccount()
         select_account = input("선택할 계좌의 계좌번호를 입력해주세요 : ")
         # 선택한 계좌가 회원이 접근가능한 한지를 검사
         info, find_index = self.IDsearch()
