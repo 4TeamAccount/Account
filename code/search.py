@@ -34,9 +34,10 @@ class SearchResult:
             return
 
     def insert_seporator(self, date):
+        print("")
 
     def make_search_list(self, search):
-        search_list = [[], []]
+        '''search_list = [[], []]
         if len(search)>0:
             while i<len(search):
                 i=0
@@ -68,8 +69,8 @@ class SearchResult:
                 else:
                     print("..! 오류: 태그를 '[', ']'로 감싸야 합니다.")
                     return
-                i += 1
-            search_list = [["2021.02", "2021.03."], []]
+                i += 1'''
+        search_list = [["2021.02", "2021.03."], []]
         # search에서 search_list[search_date_list,search_tag_list] 만들어 반환
         return search_list
 
