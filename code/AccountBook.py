@@ -1349,11 +1349,10 @@ class ChangeBuilder:
         main_tag = self.main_tag
         sub_tag = self.sub_tag
         
-        """
+        
         if t[-1] == '.':
-            print("오류 체크 추가 필요")
-            return
-          """     
+            print(".!! 오류: 태그 위치는 <숫자>.<숫자>로만 입력 가능합니다.")
+            return 'e'
         
         
         if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
