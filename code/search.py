@@ -55,6 +55,7 @@ class SearchResult:
                             else:
                                 print("..! 날짜 의미 규칙 위배")
                                 return
+                            search_list[0].append(v)
                         else:
                             print("..! 날짜는 구분자를 제외하고 셌을 때 4자리(연도만 입력), 6자리(연, 월만 입력), 8자리(연, 월, 일 입력)로만 검색 가능합니다.")
                             return
