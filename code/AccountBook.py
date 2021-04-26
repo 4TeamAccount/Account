@@ -1349,6 +1349,12 @@ class ChangeBuilder:
         main_tag = self.main_tag
         sub_tag = self.sub_tag
         
+        """
+        if t[-1] == '.':
+            print("오류 체크 추가 필요")
+            return
+          """     
+        
         
         if t[0].isdigit(): #입력이 숫자인지 판단: 숫자로 시작되는 경우 무조건 태그 위치 입력으로 봄
             t = t.replace(' ', '')
@@ -1374,11 +1380,7 @@ class ChangeBuilder:
                     cli.printSomeTag(m_tag, self.main_tag, self.sub_tag)
                     return
                 else:
-                    """
-                    if t[-1] == '.':
-                        print("오류 체크 추가 필요")
-                        return
-                    """
+                    
                     i = list(map(int,t.split('.')))
                     if i[1] <= len(sub_tag[i[0]-1]):
                         #input_tag = t #정상 결과: 하위 숫자
@@ -1434,7 +1436,10 @@ class ChangeBuilder:
         
         self.input_money = srh_m
         srh_d = srh_date
-       
+        
+        print()
+    
+        
         i = 0
     
         file_name = self.account_folder+"\\"+self.ac_num + ".txt"
@@ -1447,7 +1452,7 @@ class ChangeBuilder:
         
         
         days = [] #내역에서 날짜만 뽑은거
-        for l in lines[4:]:
+        for l in lines[5:]:
             p = l.split(' ')[-2]
             days.append(p)
         
@@ -1473,7 +1478,6 @@ class ChangeBuilder:
                     self.change_content = res
                     return index+4
                 
-            
         calc = int(self.total) + int(srh_m)
         if  calc < 0:
             return 'e'
@@ -1687,7 +1691,7 @@ class ChangeBuilder:
             self.input_date = ''
             return 
             
-    
+
     def addChange(self, account_num, atag):
         t = ''
         m = ''
@@ -1700,7 +1704,7 @@ class ChangeBuilder:
         self.account_file = file_name
         f = open(file_name, 'r')
         lines = f.readlines()
-        self.total = lines[-1].split(' ')[3]
+        self.total = lines[-1].split(' ')[-1]
         
         at = atag
         f.close()
@@ -1728,6 +1732,7 @@ class ChangeBuilder:
             except ValueError:
                     print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                     print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+                    self.addChange(account_num, atag)
         
         if len(d) >= 2:
             print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
@@ -1745,8 +1750,10 @@ class ChangeBuilder:
             if m_res == 'e':
                 if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
                     print(".!! 오류: 날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                    self.addChange(account_num, atag)
                     return 'e'
                 else:
+                    self.addChange(account_num, atag)
                     return 'e'
                 
                 """    
@@ -1775,18 +1782,22 @@ class ChangeBuilder:
                             return s
                         else:
                             print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
-                            return 'e'
+                            self.addChange(account_num, atag)
+                            #return 'e'
                     else:
-                        return 'e'
+                        self.addChange(account_num, atag)
+                        #return 'e'
                 else: #날짜 입력 안된 경우 잔고 비교
                     res_d = datetime.today().strftime("%Y.%m.%d")
                     self.input_date = res_d
                     s = self.search(res_d, m)
-                    if s != 'e':
-                        return s
-                    else:
+                    if s == 'e':
                         print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
-                        return 'e'
+                        self.addChange(account_num, atag)
+                        #return s
+                    #else:
+                     #   print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                      #  return 'e'
                 
                 
                 save_res = self.build(account_num, t, m_res)
