@@ -66,13 +66,21 @@ class SearchResult:
                     print("..! 날짜는 2개까지만 입력할 수 있습니다.")
                     return
                 else:
-                    if len(date) > 8:
-                        if len(date) != 10:
+                    if len(v) > 8:
+                        if len(v) != 10:
                             print("..! 날짜 문법 규칙 위배")
                             return
-                        elif not ((date[4] == "-" and date[7] == "-") or (date[4] == "/" and date[7] == "/") or (date[4] == "." and date[7] == ".")):
+                        elif not ((v[4] == "-" and v[7] == "-") or (v[4] == "/" and v[7] == "/") or (v[4] == "." and v[7] == ".")):
                             print("..! 날짜 문법 규칙 위배")
                             return
+                    if len(v) == 5:
+                        if v[-1] != '.' and v[-1] != '-' and v[-1] 1= '/'):
+                        print("..! 날짜 문법 규칙 위배")
+                        return
+                    if len(v) == 8:
+                        if not ((v[4] == "-" and v[7] == "-") or (v[4] == "/" and v[7] == "/") or (v[4] == "." and v[7] == ".")):
+                        print("..! 날짜 문법 규칙 위배")
+                        return
                     # 해석 들어가기 전에 여기서 사실 문법규칙 검사 해야함.... 2021.0813이 틀렸다던가...
                     date = "".join(re.findall("\d+", v))
                     if len(date) == 8 or len(date) == 6 or len(date) == 4:
