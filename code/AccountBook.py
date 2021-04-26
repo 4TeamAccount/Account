@@ -1341,6 +1341,7 @@ class ChangeBuilder:
         self.tags = dict()
         self.main_tag = []
         self.sub_tag = []
+        self.flag = True
 
     
     def setTag(self, tag): #tag가 [태그] or x.x로 들어옴
@@ -1626,7 +1627,11 @@ class ChangeBuilder:
         #print("저장할 날짜 형태 보장", save_date)
         saved_data = f"{save_tag} {money} {save_date} {save_total}"
         
-        print(f"입력 내용: {save_tag} {money}원 {save_date} {save_total}")    
+        if self.flag == True:
+            print(f"입력 내용: {save_tag} {money[1:]}원 {save_date}") 
+        else:
+            print(f"입력 내용: {save_tag} {money[1:]}원 {save_date} (오늘)")
+            self.flag = True
         
         save_check = input("AccountNumber> 정말 저장하시겠습니까? (.../No) >")
         
@@ -1742,6 +1747,7 @@ class ChangeBuilder:
                         #return 'e'
                 else: #날짜 입력 안된 경우 잔고 비교
                     res_d = datetime.today().strftime("%Y.%m.%d")
+                    self.flag = False
                     self.input_date = res_d
                     s = self.search(res_d, m)
                     if s == 'e':
