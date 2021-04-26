@@ -789,14 +789,17 @@ class Account:
             if i == 2:
                 l = file.readline()
         file.close()
-        sl = l.split(" ")
+        sl = l[:-1].split(") ")
         for s in sl:
             temp = []
-            tags = s.replace("(", " ").replace(")", "").replace("/", " ").replace("\n", "").split(" ")
+            tags = s.replace("(", "/").replace(")", "").split("/")
             for i in range(1, len(tags)):
                 if tags[i] != '':
                     temp.append(tags[i])
             tagDict[tags[0]] = temp
+#        print(tagDict)
+        return tagDict
+        
         return tagDict
 
     def addTag(self, dict):
