@@ -568,9 +568,9 @@ class UserManager:
                 f = open(UserManager.account_folder + f"\\{new_account_num}.txt", 'w', encoding='ANSI')
                 f.write("\n") # 추가
                 f.write(f"1{name}({ID})" +"\n\n")
-                f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
+                f.write("]]음식]]식사]간식] ]]공부]]필기구] ]]수입]]알바]용돈] ]]선물]]반지]" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
-                f.write(f"[계좌 생성] +{balance} {now} {balance}")
+                f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
                 f.close()
 
                 return ID,new_account_num
@@ -1142,7 +1142,7 @@ class AccountFactory:
                 name = info[find_index-1].split('\t')[0]
                 f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
-                f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
+                f.write("]]음식]]식사]간식] ]]공부]]필기구] ]]수입]]알바]용돈] ]]선물]]반지]" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
 
                 f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
@@ -1197,7 +1197,7 @@ class AccountFactory:
                 name = info[find_index-1].split('\t')[0]
                 f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
-                f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
+                f.write("]]음식]]식사]간식] ]]공부]]필기구] ]]수입]]알바]용돈] ]]선물]]반지]" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
 
                 f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
