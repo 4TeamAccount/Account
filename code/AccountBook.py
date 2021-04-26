@@ -786,7 +786,9 @@ class Account:
         # print(tag_num, tag_name)
         child_num = 0
         if len(tag_name) > 20:
-            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 15글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+        if ']' in tag_name:
+            print("] 기호는 태그 이름에 포함될 수 없습니다.")
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -816,10 +818,7 @@ class Account:
                     self.addTag(dict)
                     return 0
             temp += 1
-        if ' ' in tag_name or '\t' in tag_name:
-            print(".!!오류 : 태그 이름에는 탭이나 개행 문자가 포함될 수 없습니다.")
-            self.addTag(dict)
-            return 0
+     
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
         print(super_num, child_num)
         if child_num != 0:
@@ -853,6 +852,12 @@ class Account:
         print("태그를 수정 할 위치와 태그 이름을 입력하세요")
         tag_num, tag_name = input().replace(']', '').split('[')
         child_num = 0
+        if len(tag_name) > 20:
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+        if ']' in tag_name:
+            print("] 기호는 태그 이름에 포함될 수 없습니다.")
+            self.editTag(dict)
+            return
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -883,10 +888,7 @@ class Account:
                     return 0
                     break
             temp += 1
-        if ' ' in tag_name or '\t' in tag_name:
-            print(".!!오류 : 태그 이름에는 탭이나 개행 문자가 포함될 수 없습니다.")
-            self.editTag(dict)
-            return 0
+    
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
         if child_num != 0:
             dict[list(dict.keys())[super_num-1]][child_num-1] = tag_name
