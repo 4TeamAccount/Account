@@ -761,7 +761,7 @@ class Account:
         #             temp.append(tags[i])
         #     tagDict[tags[0]] = temp
         l = l[2:-1] #\n 제거
-        sl = l.split(']]')  
+        sl = l.split(']]')
         main_tag = sl[0: :2]
         sub_tag = list(map(lambda x:x.split(']'),sl[1: :2]))
         for i, m in enumerate(main_tag):
@@ -900,10 +900,10 @@ class Account:
         print(new_dict)
         new_tag = ""
 
-        for key in dict.keys():
+        for key in new_dict.keys():
             new_tag += ']]' + key + ']]'
             temp = 1
-            for val in dict[key]:
+            for val in new_dict[key]:
                 new_tag += val + ']'
                 temp += 1
             new_tag += ' '
