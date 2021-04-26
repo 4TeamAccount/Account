@@ -88,7 +88,11 @@ class CLIController:
             a=Account(account_num,ID)
             userType=a.userTypeCheck(account_num,ID)
             if userType=="1":
-                select_num,t=CLIController.manager_menu()
+                try:
+                    select_num,t=CLIController.manager_menu()
+                except:
+                    CLIController.printCommend()
+                    continue
                 if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
                     ch = ChangeBuilder(account_num)
                     tags = a.getAllTag(account_num)
@@ -159,7 +163,11 @@ class CLIController:
 
 
             elif userType=="2":
-                select_num,t=CLIController.manager_menu()
+                try:
+                    select_num,t=CLIController.manager_menu()
+                except:
+                    CLIController.printCommend()
+                    continue
                 if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
                     ch = ChangeBuilder(account_num)
                     tags = a.getAllTag(account_num)
@@ -191,7 +199,11 @@ class CLIController:
                     CLIController.printCommend()
                 
             elif userType=="3":
-                select_num,t=CLIController.manager_menu()
+                try:
+                    select_num,t=CLIController.manager_menu()
+                except:
+                    CLIController.printCommend()
+                    continue
                 if select_num==2:
                     print("검색 및 수정부입니다")
                 elif select_num=="5" or select_num=='manage' or select_num=='m' or select_num=='>':
@@ -736,7 +748,7 @@ class Account:
 
 
     def userTypeCheck(self,account_num,ID):
-        file_name = self.account_folder + "\\" + account_num + ".txt"
+        file_name = self.account_folder + "\\" + str(account_num) + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
         string=file.readlines()
@@ -1104,7 +1116,8 @@ class AccountFactory:
                               for line in f:
                                    pass
                               # 각 파일의 잔고만 읽어오기(파일의 마지막 행)
-                              account_print_list += [f"{account_num:<15}{line.split(' ')[-1]:<}"]
+                              line=int(line.split(' ')[-1])
+                              account_print_list += [f"{account_num:<15}{format(line,',d'):<}"]
                     # 계좌 파일이 없을 경우 함수 반환
                     else:
                          print("파일이 존재하지 않는 계좌가 발견되었습니다") 
@@ -1773,7 +1786,11 @@ if __name__ == "__main__":
         fileManager=FileManager()
         userManager=UserManager()
         fileManager.executeProgramFileCheck()
-        select_sign=CLIController.login_menu()
+        try:
+            select_sign=CLIController.login_menu()
+        except:
+            print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
+            continue
         account_num=""
         ID=""
         if select_sign=="1":
@@ -1784,7 +1801,11 @@ if __name__ == "__main__":
             commandCheck=0
             while True:
                 accountFactory.printAccount()
-                select_account=CLIController.account_manage_menu()
+                try:
+                    select_account=CLIController.account_manage_menu()
+                except:
+                    print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
+                    continue
                 if select_account=="1":
                     account_num=accountFactory.selectAccount()
                     if account_num!=False:
@@ -1803,11 +1824,15 @@ if __name__ == "__main__":
             first_check=0
             while True:
                 if first_check==0:
-                    CLIController.account_function(ID,account_num)
+                    CLIController.account_function(ID,str(account_num))
                     first_check=1
                 else:
                     accountFactory.printAccount()
-                    select_account=CLIController.account_manage_menu()
+                    try:
+                        select_account=CLIController.account_manage_menu()
+                    except:
+                        print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
+                        continue
                     if select_account=="1":
                         account_num=accountFactory.selectAccount()
                         if account_num!=False:
