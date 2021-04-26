@@ -1709,7 +1709,7 @@ class ChangeBuilder:
             
             if m_res == 'e':
                 if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
-                    print(".!! 오류: 날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
+                    print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
                     self.addChange(account_num, atag)
                     return 'e'
                 else:
