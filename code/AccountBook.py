@@ -603,7 +603,7 @@ class UserManager:
                 f.write("\n") # 추가
                 f.write(f"1{name}({ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
-                now = datetime.datetime.now().strftime('%Y.%m.%d')
+                now = datetime.now().strftime('%Y.%m.%d')
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
 
@@ -1175,7 +1175,7 @@ class AccountFactory:
                 f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
-                now = datetime.datetime.now().strftime('%Y.%m.%d')
+                now = datetime.now().strftime('%Y.%m.%d')
 
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
@@ -1230,7 +1230,7 @@ class AccountFactory:
                 f.write("\n") # 추가
                 f.write(f"1{name}({self.ID})" +"\n\n")
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
-                now = datetime.datetime.now().strftime('%Y.%m.%d')
+                now = datetime.now().strftime('%Y.%m.%d')
 
                 f.write(f"[계좌 생성] +{balance} {now} {balance}")
                 f.close()
@@ -1453,7 +1453,7 @@ class ChangeBuilder:
         
         days = [] #내역에서 날짜만 뽑은거
         for l in lines[5:]:
-            p = l.split(' ')[-2]
+            p = l.split(' ')[-1]
             days.append(p)
         
         i = 4
@@ -1526,37 +1526,6 @@ class ChangeBuilder:
             return 'e'
         
         
-      
-    def balance(self, money, *date):
-        mo = money
-        
-        if date != ():
-            da = date[0]
-            print("확인", da)
-            res_d = self.setDate(da)
-            if res_d != 'e': #숫자 입력 규칙 만족!
-                print("금액 비교하러 출동")
-                s = self.search(res_d, mo)
-                if  s != 'e':
-                    print("인덱스 보자", s)
-                    print("금액 가능!")
-                    return s
-                else:
-                    print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
-                    return 'e'
-            else:
-                return 'e'
-        else:
-            res_d = datetime.today().strftime("%Y.%m.%d")
-            self.input_date = res_d
-            s = self.search(res_d, mo)
-            if s != 'e':
-                return s
-            else:
-                print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
-                return 'e'
-        
-    
     def setDate(self, date):
         d = date
         num = re.findall("\d+", d)
@@ -1576,7 +1545,7 @@ class ChangeBuilder:
             print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.")
             return 'e'
             
-        print(f"기존 숫자 {d} 변환 숫자{num}")
+        #print(f"기존 숫자 {d} 변환 숫자{num}")
         if len(num) == 1:#20210102 경우
             num = "".join(num)
             if len(num) != 8:
@@ -1635,7 +1604,7 @@ class ChangeBuilder:
             print(".!! 오류: 해당 날짜가 현행 그레고리력에 존재하는 날짜여야 합니다.")
             return 'e'
         
-        print("setDate 부분")
+        
         res = day.strftime("%Y.%m.%d")
         self.input_date = res
         return res
@@ -1740,12 +1709,6 @@ class ChangeBuilder:
         else:
             #print("d형태", d[0])
             m_res = self.setMoney(m)
-            """
-            if len(d) == 0:    
-                m_res = self.setMoney(m)
-            else:
-                m_res = self.setMoney(m, d[0])
-            """
             
             if m_res == 'e':
                 if d != [] and not(len(d[0]) == 8 or len(d[0]) == 10):
@@ -1756,30 +1719,21 @@ class ChangeBuilder:
                     self.addChange(account_num, atag)
                     return 'e'
                 
-                """    
-                if d:
-                    for k in d:
-    
-                        for c in [',', '원']:
-                            if c in k:
-                                print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
-                """
+              
                 self.addChange(account_num, atag)
                 
             else:
                 if d != []: #날짜 입력된 경우
                     da = d[0]
-                    print("확인", da)
+                    
                     res_d = self.setDate(da)
                     
                     if res_d != 'e': #숫자 입력 규칙 만족 후 잔고 비교
-                        print("금액 비교하러 출동")
+                
                         s = self.search(res_d, m)
                         if  s != 'e':
-                            print("인덱스 보자", s)
-                            print("금액 가능!")
+                            
                             self.input_date = res_d
-                            return s
                         else:
                             print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
                             self.addChange(account_num, atag)
@@ -1802,7 +1756,7 @@ class ChangeBuilder:
                 
                 save_res = self.build(account_num, t, m_res)
                 if save_res == 'back':
-                    print("주 프롬프트 출력해야함!")
+                    
                     return 'back'
             
             
