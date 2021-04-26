@@ -174,45 +174,8 @@ class CLIController:
                 else:
                     CLIController.printCommend()
 
-
-            elif userType=="2":
-                try:
-                    select_num,t=CLIController.manager_menu()
-                except:
-                    CLIController.printCommend()
-                    continue
-                if select_num == 'add' or select_num =='a' or select_num =='+' or select_num=="1":
-                    ch = ChangeBuilder(account_num)
-                    ch.self.tags = a.getAllTag(account_num)
-                    ch.self.main_tag = list(ch.self.tags.keys())
-                    ch.self.sub_tag = list(ch.self.tags.values())
-                    if t == []:
-                        print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
-                        print("")
-                        CLIController.printAllTag(a.getAllTag(account_num))
-                    else:
-                        tmp = ' '.join(t)
-                        tmp = tmp.strip()
-                        
-                        at = ch.setTag(tmp)
-                        if at != None:
-                            add_res = ch.addChange(account_num, at)
-                            if add_res == 'back':
-                                pass
-                elif select_num=="5" or select_num=='manage' or select_num=='m' or select_num=='>':
-                    if t ==[]:
-                        break
-                    else:
-                        print(".!! 오류: 인자가 없어야 합니다.")
-                elif select_num=="7" or select_num=='quit' or select_num=='q' or select_num=='.':
-                    if t ==[]:
-                        sys.exit()
-                    else:
-                        print(".!! 오류: 인자가 없어야 합니다.")
-                else:
-                    CLIController.printCommend()
                 
-            elif userType=="3":
+            elif userType=="3" or userType=="2":
                 try:
                     select_num,t=CLIController.manager_menu()
                 except:
@@ -789,10 +752,10 @@ class Account:
             if i == 2:
                 l = file.readline()
         file.close()
-        sl = l.split(" ")
+        sl = l[:-1].split(") ")
         for s in sl:
             temp = []
-            tags = s.replace("(", " ").replace(")", "").replace("/", " ").replace("\n", "").split(" ")
+            tags = s.replace("(", "/").replace(")", "").split("/")
             for i in range(1, len(tags)):
                 if tags[i] != '':
                     temp.append(tags[i])
@@ -801,9 +764,23 @@ class Account:
 
     def addTag(self, dict):
         print("태그를 추가할 위치와 태그 이름을 입력하세요")
-        tag_num, tag_name = input().replace(']', '').split('[')
-        print(tag_num, tag_name)
+        try:
+            tag_num, tag_name = input().replace(']', '').split('[')
+
+        except:
+            print(".!!오류 : 입력 규칙을 확인하세요.")
+            self.addTag(dict)
+            return 0
+
         child_num = 0
+        if len(tag_name) > 20:
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            self.addTag(dict)
+            return 0
+        if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
+            print("특수문자 ()[]/ 은 태그 이름에 포함 될 수 없습니다.")
+            self.addTag(dict)
+            return 0
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -818,7 +795,6 @@ class Account:
                 dict[key] = []
             if temp == super_num:
                 if len(dict[key]) >= child_num:
-                    print(child_num, len(dict[key]), dict[key])
                     print(".!!오류 : 해당 위치에 태그가 이미 존재 합니다.")
                     self.addTag(dict)
                     return 0
@@ -838,7 +814,6 @@ class Account:
             self.addTag(dict)
             return 0
         # 특수 문자와 숫자로만 이루어 졌을때랑 길이 넘을때 오류 넣어야함
-        print(super_num, child_num)
         if child_num != 0:
             temp = 0
             for key in dict.keys():
@@ -848,7 +823,6 @@ class Account:
                     break
         else:
             dict[tag_name] = []
-        print(dict)
         new_tag = ""
 
         for key in dict.keys():
@@ -869,12 +843,26 @@ class Account:
             if '(' in line and '/' in line and ')' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
-        print(new_tag)
 
     def editTag(self, dict):
         print("태그를 수정 할 위치와 태그 이름을 입력하세요")
-        tag_num, tag_name = input().replace(']', '').split('[')
+        try:
+            tag_num, tag_name = input().replace(']', '').split('[')
+
+        except:
+            print(".!!오류 : 입력 규칙을 확인하세요.")
+            self.addTag(dict)
+            return 0
         child_num = 0
+        if len(tag_name) > 20:
+            print(".!! 오류 : 태그 이름으로 사용할 수 없습니다. 아래 사항을 참고해주세요. \n1. 공백 포함 20글자의 문자열을 입력해주세요.\n2. 숫자와 특수문자들로만 이루어진 문자열은 불허입니다.")
+            self.editTag(dict)
+            return 0
+        if '(' in tag_name or ')' in tag_name or '[' in tag_name or ']' in tag_name or '/' in tag_name:
+            print("특수문자 ()[]/ 은 태그 이름에 포함 될 수 없습니다.")
+            self.editTag(dict)
+            return 0
+        
         if '.' in tag_num:
             super_num, child_num = map(int, tag_num.split('.'))
         else:
@@ -921,7 +909,6 @@ class Account:
             for keys in new_keys:
                 new_dict[keys] = dict[list(dict.keys())[temp]]
                 temp += 1
-        print(new_dict)
         new_tag = ""
 
         for key in new_dict.keys():
@@ -942,10 +929,8 @@ class Account:
             if '(' in line and '/' in line and ')' in line:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
-        print(new_tag)
 
     def deleteTag(self, dict):
-        print(dict)
         print("삭제할 태그 위치를 입력하세요")
         tag_num = input()
         for c in tag_num:
@@ -971,7 +956,6 @@ class Account:
         #하위태그는 입력 안했을때
         if child_num == 0:
             #삭제하려는 태그의 하위태그가 존재할때
-            print(super_num, child_num)
             if len(dict[list(dict.keys())[super_num-1]]) != 0:
                 print(".!!오류 : 해당 위치에 태그에 하위 태그들이 존재하면 삭제 할 수 없습니다.")
                 self.deleteTag(dict)
@@ -1008,11 +992,10 @@ class Account:
                 line = line.replace(line, new_tag)
             sys.stdout.write(line)
         print("...태그 삭제가 완료되었습니다.")
-        print(new_tag)
 
     def getAllUser(self, account_num):
 
-        file_name = self.account_folder + "\\" + account_num + ".txt"
+        file_name = self.account_folder + "\\" + self.account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
         file.readline()
@@ -1025,8 +1008,7 @@ class Account:
     #목록에 입력한 사용자가 있으면 True 없으면 False
     def isUser(self):
         user = input("사용자 이름>")
-        account_num = self.account_file[0:-4]
-        userList = self.getAllUser(account_num)
+        userList = self.getAllUser(self.account_num)
         userList = list(map(lambda x: x[0][1:], userList))
         result = user in userList
         if result:
@@ -1117,31 +1099,31 @@ class AccountFactory:
 
     # 회원이 사용할 수 있는 계좌를 출력
     def printAccount(self):
-          info, find_index = self.IDsearch()
-          if not find_index == -1:
-               account_list = info[find_index+1][0:-1].split(' ')
-               account_print_list = []
-               # 이 회원이 사용할 수 있는 계좌들이 실제 파일로 있는지 확인
-               for account_num in account_list:
-                    account_file = self.account_folder + f"\\{account_num}.txt"
-                    # 계좌 파일이 존재할 경우
-                    if os.path.isfile(account_file):
-                         with open(account_file, mode='r', encoding='ANSI') as f:
-                              for line in f:
-                                   pass
-                              # 각 파일의 잔고만 읽어오기(파일의 마지막 행)
-                              line=int(line.split(' ')[-1])
-                              account_print_list += [f"{account_num:<15}{format(line,',d'):<}"]
-                    # 계좌 파일이 없을 경우 함수 반환
-                    else:
-                         print("파일이 존재하지 않는 계좌가 발견되었습니다") 
-                         return
+        info, find_index = self.IDsearch()
+        if not find_index == -1:
+            account_list = info[find_index+1][0:-1].split(' ')
+            account_print_list = []
+            # 이 회원이 사용할 수 있는 계좌들이 실제 파일로 있는지 확인
+            for account_num in account_list:
+                account_file = self.account_folder + f"\\{account_num}.txt"
+                # 계좌 파일이 존재할 경우
+                if os.path.isfile(account_file):
+                        with open(account_file, mode='r', encoding='ANSI') as f:
+                            for line in f:
+                                pass
+                            # 각 파일의 잔고만 읽어오기(파일의 마지막 행)
+                            line=int(line.split(' ')[-1])
+                            account_print_list += [f"{account_num:<15}{format(line,',d'):<}"]
+                # 계좌 파일이 없을 경우 함수 반환
+                else:
+                        print("파일이 존재하지 않는 계좌가 발견되었습니다") 
+                        return
 
-               # 여기까지 왔으면 모든 계좌를 출력가능
-               print("============계좌 목록 출력============")
-               print(f"{'계좌번호':<10} 잔고")
-               for account in account_print_list:
-                    print(account)
+            # 여기까지 왔으면 모든 계좌를 출력가능
+            print("============계좌 목록 출력============")
+            print(f"{'계좌번호':<10} 잔고")
+            for account in account_print_list:
+                print(account)
 
     def createAccountAsFileCheck(self,info,find_index):
         balance = 0
@@ -1341,6 +1323,7 @@ class ChangeBuilder:
         self.tags = dict()
         self.main_tag = []
         self.sub_tag = []
+        self.flag = True
 
     
     def setTag(self, tag): #tag가 [태그] or x.x로 들어옴
@@ -1348,7 +1331,6 @@ class ChangeBuilder:
         ac=Account(self.ac_num,"")
         cli = CLIController()
         t = tag
-        #print(f"값{t} 형태{type(t)}")
         main_tag = self.main_tag
         sub_tag = self.sub_tag
         
@@ -1447,7 +1429,7 @@ class ChangeBuilder:
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
-        print("파일 내용 출력", lines)
+        #print("파일 내용 출력", lines)
         f_s.close()
         
         
@@ -1614,7 +1596,6 @@ class ChangeBuilder:
         
         money = self.input_money
         
-        print(money)
         
         if '+' not in money and '-' not in money:
             money = '+' + money
@@ -1626,7 +1607,11 @@ class ChangeBuilder:
         #print("저장할 날짜 형태 보장", save_date)
         saved_data = f"{save_tag} {money} {save_date} {save_total}"
         
-        print(f"입력 내용: {save_tag} {money}원 {save_date} {save_total}")    
+        if self.flag == True:
+            print(f"입력 내용: {save_tag} {money[1:]}원 {save_date}") 
+        else:
+            print(f"입력 내용: {save_tag} {money[1:]}원 {save_date} (오늘)")
+            self.flag = True
         
         save_check = input("AccountNumber> 정말 저장하시겠습니까? (.../No) >")
         
@@ -1641,7 +1626,6 @@ class ChangeBuilder:
             f = open(file_name, 'r+')
             lines = f.readlines()
             line = lines[:i]
-            print(line)
             
             cc = self.change_content
             cc.append(saved_data)
@@ -1703,6 +1687,7 @@ class ChangeBuilder:
                     self.addChange(account_num, atag)
         
         if len(d) >= 2:
+            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
             self.addChange(account_num, atag)
         else:
@@ -1742,6 +1727,7 @@ class ChangeBuilder:
                         #return 'e'
                 else: #날짜 입력 안된 경우 잔고 비교
                     res_d = datetime.today().strftime("%Y.%m.%d")
+                    self.flag = False
                     self.input_date = res_d
                     s = self.search(res_d, m)
                     if s == 'e':
@@ -1844,6 +1830,7 @@ if __name__ == "__main__":
         elif select_sign=="2":
             ID,account_num=userManager.signUp()
             first_check=0
+            accountFactory=AccountFactory(ID)
             while True:
                 if first_check==0:
                     CLIController.account_function(ID,str(account_num))
