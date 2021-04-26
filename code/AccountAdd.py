@@ -5,7 +5,7 @@ import fileinput
 import sys
 import os
 
-#ACCOUNT_PATH = "C:/Users/thekoo/Documents/GitHub/Account/394028.txt"
+#ACCOUNT_PATH = "C:/Users/thekoo/Documents/GitHub/Account/771137.txt"
 
 user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
 account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
@@ -64,7 +64,7 @@ class ChangeBuilder:
             
             if any(x.isalpha() for x in t): #숫자와 문자 혼합
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag('394028'))
+                cli.printAllTag(ac.getAllTag('771137'))
                 return
             
             if t.count('.') >= 2:
@@ -95,11 +95,11 @@ class ChangeBuilder:
 
                     else:
                         print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                        cli.printAllTag(ac.getAllTag('394028'))
+                        cli.printAllTag(ac.getAllTag('771137'))
                         return
             else:
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag('394028'))
+                cli.printAllTag(ac.getAllTag('771137'))
                 return
                 
         else: #입력이 문자
@@ -126,7 +126,7 @@ class ChangeBuilder:
                 return 
             elif not t in sum(sub_tag, []):
                 print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag('394028'))
+                cli.printAllTag(ac.getAllTag('771137'))
                 return
             else:
                 #print("정상 입력 태그: {}" .format(t)) #확인용 지우기
@@ -144,7 +144,6 @@ class ChangeBuilder:
         srh_d = srh_date
        
         i = 0
-
         file_name = self.account_folder + "\\" + self.ac_num + ".txt"
         self.account_file = file_name
         f_s = open(file_name, 'r')
@@ -390,7 +389,7 @@ class ChangeBuilder:
         d = ''
         
         self.ac_num = account_num
-        
+
         file_name = self.account_folder + "\\" +  account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r')
@@ -489,7 +488,7 @@ class Account:
 if __name__ == '__main__':
     ch = ChangeBuilder()
     ac = Account()
-    tags = ac.getAllTag('394028')
+    tags = ac.getAllTag('771137')
     main_tag = list(tags.keys())
     sub_tag = list(tags.values())
 
@@ -500,13 +499,13 @@ if __name__ == '__main__':
         if t == []:
             print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
             print("")
-            CLIController.printAllTag(ac.getAllTag('394028'))
+            CLIController.printAllTag(ac.getAllTag('771137'))
         else:
             tmp = ' '.join(t)
             tmp = tmp.strip()
             at = ch.setTag(tmp)
             if at != None:
-                add_res = ch.addChange('394028', at)
+                add_res = ch.addChange('771137', at)
                 if add_res == 'back':
                     print("주프롬프트 출력")
     
