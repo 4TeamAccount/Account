@@ -63,28 +63,28 @@ class CLIController:
         select_num=int(input("AccountNumber >"))
         return select_num
     def printCommend():
-        print("========================================================")
+        print("=====================================================================================================================")
         print("    명령어군         올바른인자들            설명        ")
-        print("--------------------------------------------------------")
-        print("1 add        a  +       한 개 이상      추가 메뉴를 출력~")
-        print("--------------------------------------------------------")
-        print("2 find       f  /       없거나 여러 개  최근 내역을 출력~")
-        print("--------------------------------------------------------")
-        print("3 tag        t  [       없음            태그 메뉴를 출력~")
-        print("--------------------------------------------------------")
-        print("4 permission p  @       없음            권한 메뉴를 출력~")
-        print("--------------------------------------------------------")
-        print("5 manage     m  >       없음            전체 계좌 목록을~")
-        print("--------------------------------------------------------")
-        print("6 verify     f  !       없음             데이터 무결성~ ")
-        print("--------------------------------------------------------")
-        print("7 quit       q  .       없음             프로그램을 종료~")
-        print("--------------------------------------------------------")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("1 add        a  +       한 개 이상      추가 메뉴를 출력합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("2 find       f  /       없거나 여러 개  최근 내역을 출력하거나 인자의 날짜(혹은 구간), 태그로 내역을 검색합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("3 tag        t  [       없음            태그 메뉴를 출력합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("4 permission p  @       없음            권한 메뉴를 출력합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("5 manage     m  >       없음            전체 계좌 목록과 계좌 메뉴를 출력합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("6 verify     f  !       없음             데이터 무결성 확인 및 처리를 진행합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
+        print("7 quit       q  .       없음             프로그램을 종료합니다.")
+        print("---------------------------------------------------------------------------------------------------------------------")
 
     def account_function(ID,account_num):
         while True:
             filemanager=FileManager()
-            fileManager.accountBalanceFileCheck(os.path.expanduser('~') + "\\Account-data" + "\\Account\\"+account_num+".txt")
+            fileManager.accountBalanceFileCheck(os.path.expanduser('~') + "\\Account-data" + "\\Account\\"+str(account_num)+".txt")
             a=Account(account_num,ID)
             userType=a.userTypeCheck(account_num,ID)
             if userType=="1":
@@ -108,7 +108,7 @@ class CLIController:
                                 pass
                 
                 elif select_num=="2":
-                    print("수입지출추가부입니다.")
+                    print("검색 및 수정부입니다")
                 elif select_num=="3" or select_num=='tag' or select_num=='t' or select_num=='[':
                     while True:
                         CLIController.printAllTag(a.getAllTag(account_num))
@@ -120,10 +120,10 @@ class CLIController:
                             a.addTag(a.getAllTag(account_num))
                             break
                         elif select=="2":
-                            a.deleteTag(a.getAllTag(account_num))
+                            a.editTag(a.getAllTag(account_num))
                             break
                         elif select=="3":
-                            a.editTag(a.getAllTag(account_num))
+                            a.deleteTag(a.getAllTag(account_num))
                             break
                         else:
                             print("..! 오류:1~3중의 숫자만 입력해주세요")
@@ -347,7 +347,7 @@ class UserManager:
 
             # 문법 규칙2 : 출생 연도(1900~2002)
             if generation==19:
-                if not (iden_num[0:2] in map(lambda m: '0'+str(m) if m<10 else str(m), range(0, 99))):
+                if not (iden_num[0:2] in map(lambda m: '0'+str(m) if m<10 else str(m), range(0, 100))):
                         print("잘못된 출생연도입니다.")
                         continue
             elif generation==20:
@@ -1770,10 +1770,9 @@ if __name__ == "__main__":
     # a.deleteTag(a.getAllTag('394028'))
     # a.editTag(a.getAllTag('394028'))
     while True:
-        #1.무결성 검사 후 실패시 리턴
         fileManager=FileManager()
         userManager=UserManager()
-        
+        fileManager.executeProgramFileCheck()
         select_sign=CLIController.login_menu()
         account_num=""
         ID=""
@@ -1821,7 +1820,6 @@ if __name__ == "__main__":
                         print("..! 오류: 인자는 1~3사이의 숫자 하나여야 합니다")
             
         elif select_sign=="3":
-            print("종료")
             sys.exit()
             break
         else:
