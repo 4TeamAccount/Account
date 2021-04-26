@@ -1,6 +1,5 @@
 import os
 import re
-
 import AccountBook
 
 
@@ -54,11 +53,12 @@ class SearchResult:
                 tmp = tmp + ' ' + v
                 if v[-1] == ']':
                     tag = tmp.strip()
-                    search_list[1].append(tag)
+                    search_list[1].append(tag)  # 공백전혀 포함하지 않은 경우
                     tmp = ""
             elif v[-1] == ']' and len(tmp) != 0:
                 tmp = tmp + ' ' + v
-                tag = tmp.strip()
+                tmpl = tmp.strip()[1:-1].strip()
+                tag = '['+' '.join(tmpl.split())+']'
                 search_list[1].append(tag)
                 tmp = ""
             elif len(tmp) == 0 and v[0].isdigit():
@@ -278,6 +278,7 @@ if __name__ == '__main__':
     while True:
         try:
             select_num, *t = input("\nAccountNumber> ").split()
+            # if(check_tag(tag)):#태그 문법 규칙 검사 -> t에 탭이 있는지........
         except:
             AccountBook.CLIController.printCommend()
             continue
