@@ -192,7 +192,6 @@ class SearchResult:
         while True:
             try:
                 c, *t = input("\nAccountNumber> 내역 수정> ").split()
-                t = ' '.join(t)
             except:
                 print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
                 print("입력 예시) tag [카페]")
@@ -205,6 +204,11 @@ class SearchResult:
                 change_builder.tags = a.getAllTag(self.account_num)
                 change_builder.main_tag = list(change_builder.tags.keys())
                 change_builder.sub_tag = list(change_builder.tags.values())
+                if t == []:
+                    print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
+                    print("")
+                    AccountBook.CLIController.printAllTag(a.getAllTag(self.account_num))
+                t = ' '.join(t)
                 tag = change_builder.setTag(t)
                 print(tag)
                 if tag != 'e':
