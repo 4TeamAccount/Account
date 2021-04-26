@@ -309,7 +309,7 @@ class UserManager:
 
             # 이름 문법 규칙 : 길이 >=1, 첫/마지막은 실상 문자, 탭/개행 X
             if not (len(name)>=1 and (name[0].isprintable() and not name[0].isspace() and name[-1].isprintable()
-                                        and not name[-1].isspace()) and not any(ch in name for ch in [u'\u0009', u'\u000A', u'\u000D'])):
+                                        and not name[-1].isspace()) and not any(ch in [u'\u0009', u'\u000A', u'\u000D'] for ch in name)):
                 print("잘못된 이름입니다. 다시 입력해주세요")
                 continue
 
@@ -1162,7 +1162,7 @@ class AccountFactory:
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
 
-                f.write(f"[계좌 생성] +{balance} {now} {balance}")
+                f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
                 f.close()
         else:
             print("!!! 오류:계좌 생성에 실패하였습니다. 프로그램을 종료합니다.")
@@ -1217,7 +1217,7 @@ class AccountFactory:
                 f.write("음식(까페/식사/간식) 공부(책/인강/필기구) 수입(알바/용돈) 선물(반지)" + "\n\n")
                 now = datetime.now().strftime('%Y.%m.%d')
 
-                f.write(f"[계좌 생성] +{balance} {now} {balance}")
+                f.write(f"[계좌 생성] +{balance} {now} {balance}\n")
                 f.close()
         else:
             print("ID를 찾지 못했습니다")
