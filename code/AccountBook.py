@@ -1634,6 +1634,8 @@ class ChangeBuilder:
 
     def addChange(self, account_num, atag):
         
+        ac = Account(account_num, ID)
+        
              
         t = ''
         m = ''
@@ -1737,7 +1739,6 @@ class ChangeBuilder:
                         self.addChange(account_num, atag)
                         return
                     
-                #(f"Search 결과: {s}") #test용
                 save_res = self.build(account_num, t, s)
                 if save_res == 'back':
                     return 'back'
