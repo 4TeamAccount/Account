@@ -1638,6 +1638,12 @@ class ChangeBuilder:
             return
 
     def addChange(self, account_num, atag):
+        
+        if not FileManager.fileAccess(self.path_dataFile) or not FileManager.fileAccess(
+                    self.user_path) or not FileManager.fileAccess(self.account_path):
+                print(self.path_dataFile + "에 대한 권한이 없습니다!")
+                return 'back'
+             
         t = ''
         m = ''
         d = ''
