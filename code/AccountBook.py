@@ -1449,10 +1449,9 @@ class ChangeBuilder:
                     self.new_total = ''
                     return 'e'
                 else:
-                    print(f"{tmp}, index = {index}, 결과: {c_tmp}")
                     res = list(map(lambda x, y: x + ' ' + str(y), tmp[index:], c_tmp))
                     self.change_content = res
-                    print(f"change_content = {self.change_content}")
+                    
                     return index + 5
 
         calc = int(self.total) + int(srh_m)
@@ -1504,7 +1503,7 @@ class ChangeBuilder:
 
     def setDate(self, date):
         d = date
-        num = re.findall("\d+", d)
+        num = re.findall("\d+", str(d))
 
         if '.' in d and (d.count('-') != 0 or d.count('/')):
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
