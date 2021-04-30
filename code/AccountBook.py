@@ -1477,6 +1477,10 @@ class ChangeBuilder:
             # print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
         elif len(mo) == 1:
+            if '+' not in mo and '-' not in mo:
+                mo = '+' + mo
+                self.input_money = str(mo)
+            
             return mo
 
         if not mo[0] in head:  # 숫자 맨 앞은 숫자랑 + -로만 가능"
@@ -1499,6 +1503,11 @@ class ChangeBuilder:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
+        
+        if '+' not in mo and '-' not in mo:
+            mo = '+' + mo
+            self.input_money = str(mo)
+            
         return mo
 
     def setDate(self, date):
@@ -1584,7 +1593,7 @@ class ChangeBuilder:
     def build(self, account_num, save_tag, i):
 
         money = self.input_money
-
+        
         if '+' not in money and '-' not in money:
             money = '+' + money
             self.input_money = money
@@ -1639,10 +1648,6 @@ class ChangeBuilder:
 
     def addChange(self, account_num, atag):
         
-        if not FileManager.fileAccess(self.path_dataFile) or not FileManager.fileAccess(
-                    self.user_path) or not FileManager.fileAccess(self.account_path):
-                print(self.path_dataFile + "에 대한 권한이 없습니다!")
-                return 'back'
              
         t = ''
         m = ''
