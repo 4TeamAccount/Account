@@ -1472,7 +1472,6 @@ class ChangeBuilder:
         mids = [',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         tail = ['원', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         if len(mo) == 1 and not mo[0] in digits:
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("문자열 길이가 1이라면 그 문자는 무조건 숫자여야 함")  # 목업 따로 없어서 추가했습니다.
             # print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
@@ -1484,7 +1483,6 @@ class ChangeBuilder:
             return mo
 
         if not mo[0] in head:  # 숫자 맨 앞은 숫자랑 + -로만 가능"
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
 
@@ -1495,12 +1493,10 @@ class ChangeBuilder:
                     flag = True
 
             if flag == False:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
                 return 'e'
 
         if not mo[-1] in tail:  # 숫자 끝은 원이랑 숫자만 가능
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
         
@@ -1515,16 +1511,13 @@ class ChangeBuilder:
         num = re.findall("\d+", str(d))
 
         if '.' in d and (d.count('-') != 0 or d.count('/')):
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.")  # 이게 조금 더 명확한 것 같음?
             return 'e'
 
         elif '-' in d and (d.count('.') != 0 or d.count('/')):
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.")
             return 'e'
         elif '/' in d and (d.count('.') != 0 or d.count('-')):
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.")
             return 'e'
 
@@ -1532,7 +1525,6 @@ class ChangeBuilder:
         if len(num) == 1:  # 20210102 경우
             num = "".join(num)
             if len(num) != 8:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
                 return 'e'
             else:
@@ -1542,16 +1534,13 @@ class ChangeBuilder:
 
         elif len(num) == 3:
             if len(num[0]) != 4:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 연도는 4자리로 입력해야 합니다.")
                 return 'e'
 
             if any(map(lambda x: len(x) != 2, num[1:])):
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 월과 일은 2자리로 입력해야 합니다.")
                 return 'e'
         else:
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 연도는 4자리, 월과 일은 2자리로 입력해야 합니다.")
             return 'e'
 
@@ -1565,24 +1554,20 @@ class ChangeBuilder:
                 if ch in k:
                     flag = True
             if flag == False:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print("날짜는 ‘-’, ‘/’, ‘.’, 숫자로만 써주세요.")
                 return 'e'
 
         today = datetime.today()
         if 1970 > num[0] or num[0] > 2037:
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 연도가 1970년 이후부터 2037년 이전까지여야 합니다.")
             return 'e'
 
         try:
             day = datetime(num[0], num[1], num[2])
             if day > today:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 미래의 내역은 작성할 수 없습니다.")
                 return 'e'
         except:
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 해당 날짜가 현행 그레고리력에 존재하는 날짜여야 합니다.")
             return 'e'
 
@@ -1597,7 +1582,8 @@ class ChangeBuilder:
         if '+' not in money and '-' not in money:
             money = '+' + money
             self.input_money = money
-
+            
+        print(f"{self.input_money}")
         save_date = self.input_date
         save_total = self.new_total
 
@@ -1678,6 +1664,7 @@ class ChangeBuilder:
                 print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
                 self.addChange(account_num, atag)
+                return
         elif type(atag) == str:
             main_key = ''
             for key, value in self.tags.items():
@@ -1690,16 +1677,19 @@ class ChangeBuilder:
                 if m == "":
                     print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
                     self.addChange(account_num, atag)
+                    return
 
             except ValueError:
                 print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
                 self.addChange(account_num, atag)
+                return
 
         if len(d) >= 2:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print(".!! 오류: 인자가 너무 많습니다. 날짜와 금액은 공백을 허용하지 않습니다.")
             self.addChange(account_num, atag)
+            return
         else:
             # print("d형태", d[0])
             m_res = self.setMoney(m)
@@ -1710,10 +1700,12 @@ class ChangeBuilder:
                     self.addChange(account_num, atag)
                     return 'e'
                 else:
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                     self.addChange(account_num, atag)
                     return 'e'
 
                 self.addChange(account_num, atag)
+                return
 
             else:
                 if d != []:  # 날짜 입력된 경우
@@ -1730,8 +1722,11 @@ class ChangeBuilder:
                         else:
                             print("입력한 금액이 사용자의 지출 내역에 있는 금액보다 큽니다.")
                             self.addChange(account_num, atag)
+                            return
                     else:
+                        print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                         self.addChange(account_num, atag)
+                        return
                 else:  # 날짜 입력 안된 경우 잔고 비교
                     res_d = datetime.today().strftime("%Y.%m.%d")
                     self.flag = False
@@ -1740,6 +1735,7 @@ class ChangeBuilder:
                     if s == 'e':
                         print("입력한 금액이 사용자의 지출 내역에 있는 금액보다 큽니다.")
                         self.addChange(account_num, atag)
+                        return
                     
                 #(f"Search 결과: {s}") #test용
                 save_res = self.build(account_num, t, s)
