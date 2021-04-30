@@ -408,7 +408,7 @@ class UserManager:
                 # 회원 정보를 담고 있는 행에서만 검색
                 if index % 4 == 0:
                     user = user.rstrip()
-                    f_name, f_iden_num = ('\t', 1)
+                    f_name, f_iden_num = user.split('\t', 1)
                     # 회원일 경우
                     if f_name == name and f_iden_num == iden_num:
                         find_index = index
@@ -742,12 +742,10 @@ class Account:
         self.account_file = file_name
         file = open(file_name, 'r')
         string = file.readlines()
-        
 
         userline = string[1]
         userList = userline.split("\t")
         file.close()
-        
         for user in userList:
             if user.split("(")[1].replace(")", "").replace("\n", "") == ID:
                 return user[0]
@@ -958,6 +956,7 @@ class Account:
         # 하위태그는 입력 안했을때
         if child_num == 0:
             # 삭제하려는 태그의 하위태그가 존재할때
+            print(super_num, child_num)
             if len(dict[list(dict.keys())[super_num - 1]]) != 0:
                 print(".!!오류 : 해당 위치에 태그에 하위 태그들이 존재하면 삭제 할 수 없습니다.")
                 self.deleteTag(dict)
@@ -1418,51 +1417,37 @@ class ChangeBuilder:
 
         days = []  # 내역에서 날짜만 뽑은거
         for l in lines[5:]:
-            p = l.split(' ')[-2]
+            p = l.split(' ')[-1]
             days.append(p)
 
-        i = 5
-        
+        i = 4
         change_content = lines[int(i):]
         tmp = list(map(lambda x: x.rstrip(), change_content))
 
         current = list(map(lambda x: x.split(' ')[-1], tmp))  # 합계만 자른거
         tmp2 = list(map(lambda x: x[:-1].split(' ')[:-1], tmp))
         tmp = list(map(lambda x: ' '.join(x), tmp2))  # 합계 전까지만 자른거
-        
-        #print(f"change_content : {change_content}") #test용
-        #print(f"tmp = {tmp}") #test용
 
         for index, t in enumerate(days):
-            #print(f"day는 {srh_d}, t는 {t}, index = {index}") #test용
+
             if srh_d < t:
                 c_tmp = list(int(x) + int(srh_m) for x in current[index:])
-                if index == 0:
-                    if int(srh_m) < 0:
-                        return 'e'
-                    else:
-                        self.new_total = int(srh_m)
-                else:
-                    self.new_total = int(current[index-1]) + int(srh_m)
-            
+                self.new_total = c_tmp[-1] + int(srh_m)
+
                 if any(c < 0 for c in c_tmp):  # 이후 내역이 입력 금액 때문에 음수가 되는 상황
                     self.new_total = ''
                     return 'e'
                 else:
-                    print(f"{tmp}, index = {index}, 결과: {c_tmp}")
                     res = list(map(lambda x, y: x + ' ' + str(y), tmp[index:], c_tmp))
                     self.change_content = res
-                    print(f"change_content = {self.change_content}")
-                    return index + 5
+                    return index + 4
 
         calc = int(self.total) + int(srh_m)
-        #print(f"재계산 결과: {calc}") #test용
         if calc < 0:
             return 'e'
         else:
             self.new_total = calc
-            self.change_content = []
-            return len(tmp) + 5
+            return len(tmp) + 4
 
     def setMoney(self, money):
         mo = "".join(money)
@@ -1476,6 +1461,7 @@ class ChangeBuilder:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("문자열 길이가 1이라면 그 문자는 무조건 숫자여야 함")  # 목업 따로 없어서 추가했습니다.
             # print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+            print(mo)
             return 'e'
         elif len(mo) == 1:
             return mo
@@ -1609,23 +1595,18 @@ class ChangeBuilder:
         else:
             self.input_tag = save_tag
 
-            file_name = self.account_folder + "\\" + self.ac_num + ".txt" 
+            file_name = self.account_folder + "\\" + self.ac_num + ".txt"  # 파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
             # file_name = account_num + ".txt"
             self.account_file = file_name
             f = open(file_name, 'r+')
             lines = f.readlines()
             line = lines[:i]
-            
-            #print(f"lin = {line[:i]}, i = {i}") #test용
-            
+
             cc = self.change_content
-            cc.insert(0, saved_data)
-            #cc.append(saved_data)
+            cc.append(saved_data)
             cc = list(map(lambda x: x + '\n', cc))
-            
+
             res = line + cc
-            
-            #print(f"res = {res}, cc = {cc}") #test용
 
             f.seek(0)
             f.writelines(res)
@@ -1635,7 +1616,6 @@ class ChangeBuilder:
             self.input_tag = ''
             self.input_money = ''
             self.input_date = ''
-            
             return
 
     def addChange(self, account_num, atag):
@@ -1656,35 +1636,40 @@ class ChangeBuilder:
         f.close()
 
         if type(atag) == list:
-            try:
+            #try:
                 m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> ".format(self.main_tag[at[0] - 1],
                                                                                 self.sub_tag[at[0] - 1][
                                                                                     at[1] - 1])).split(" "))
-                t = f"[{self.main_tag[at[0] - 1]}][{self.sub_tag[at[0] - 1][at[1] - 1]}]"
-                if m == "":
+                if d == ():
                     print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+                    t = f"[{self.main_tag[at[0] - 1]}][{self.sub_tag[at[0] - 1][at[1] - 1]}]"
                     self.addChange(account_num, atag)
-            except ValueError:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
-                print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
-                self.addChange(account_num, atag)
+                    #return
+            #except ValueError:
+             #   print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+              #  print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+               # self.addChange(account_num, atag)
         elif type(atag) == str:
-            main_key = ''
+           
+            print("태그스", self.tags.items())
+            print("At", at)
+            print(self.tags.items())
             for key, value in self.tags.items():
                 if at in value:
                     main_key = key
                     break
-            try:
+            #try:
                 m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> ".format(main_key, at)).split())
-                t = f"[{main_key}][{at}]"
-                if m == "":
+                if d == ():
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                     print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+                    t = f"[{main_key}][{at}]"
                     self.addChange(account_num, atag)
 
-            except ValueError:
-                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
-                print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
-                self.addChange(account_num, atag)
+            #except ValueError:
+                #print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                #print(".!! 오류: 금액은 길이가 1 이상이어야 합니다.")
+                #self.addChange(account_num, atag)
 
         if len(d) >= 2:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
@@ -1718,23 +1703,30 @@ class ChangeBuilder:
 
                             self.input_date = res_d
                         else:
-                            print("입력한 금액이 사용자의 지출 내역에 있는 금액보다 큽니다.")
+                            print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
                             self.addChange(account_num, atag)
+                            # return 'e'
                     else:
                         self.addChange(account_num, atag)
+                        # return 'e'
                 else:  # 날짜 입력 안된 경우 잔고 비교
                     res_d = datetime.today().strftime("%Y.%m.%d")
                     self.flag = False
                     self.input_date = res_d
                     s = self.search(res_d, m)
                     if s == 'e':
-                        print("입력한 금액이 사용자의 지출 내역에 있는 금액보다 큽니다.")
+                        print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
                         self.addChange(account_num, atag)
-                    
-                #(f"Search 결과: {s}") #test용
+                        # return s
+                    # else:
+                    #   print("입력한 금액이 사용자의 잔고에 있는 금액보다 큽니다.")
+                    #  return 'e'
+
                 save_res = self.build(account_num, t, s)
                 if save_res == 'back':
                     return 'back'
+
+        # print("입력/지출 부분")
 
 
 class SearchResult:
@@ -1853,10 +1845,6 @@ class SearchResult:
             for i in range(min(10, len(self.changes))):
                 date_match_set.add(i)
 
-        if len(search_date_list) != 0:
-            search_date_list[0]=search_date_list[0][:-1]
-
-
         if len(search_date_list) == 1:
             for k in search_date_list:
                 for i, v in enumerate(self.changes):
@@ -1909,6 +1897,7 @@ class SearchResult:
                 print("..! 존재하지 않는 번호입니다. 범위 내의 정수만 입력할 수 있습니다.")
                 continue
             if select == 0:
+                print("주프롬프트로 돌아감")
                 return
             elif 0 < select <= len(match_list):
                 return match_list[select - 1]
@@ -1942,6 +1931,7 @@ class SearchResult:
                 print("..! 1~3 중 원하는 기능의 메뉴 번호를 입력하세요.")
                 print("1.내역 수정    2. 내역 삭제     3. 취소")
                 print("선택된 내역: ", " ".join(self.changes[selected_change_num].split()[:-1]))
+        print("주프롬프트로 돌아감")
         return
 
     def edit_change(self, change_num):
@@ -1980,10 +1970,7 @@ class SearchResult:
                     if type(tag) == list:
                         tag = '[' + change_builder.main_tag[tag[0] - 1] + ']' + '[' + \
                               change_builder.sub_tag[tag[0] - 1][tag[1] - 1] + ']'
-                        new_change = self.changes[change_num].replace(self.changes[change_num].split()[-4:-3][0],
-                                                                      tag)  # tag 넣은 새 내역 문자열
                     elif type(tag) == str:
-                        tag = '[' + mtag +']' + '[' + tag +']'
                         new_change = self.changes[change_num].replace(self.changes[change_num].split()[-4:-3][0],
                                                                       tag)  # tag 넣은 새 내역 문자열
                     break
@@ -1997,6 +1984,7 @@ class SearchResult:
                     break
             elif c == 'money':
                 money = change_builder.setMoney(t)
+                print(돈)
                 if money != 'e':
                     new_change = self.changes[change_num].replace(self.changes[change_num].split()[-3:-2][0],
                                                                   money)  # money 넣은 새 내역 문자열
@@ -2014,7 +2002,7 @@ class SearchResult:
             return
 
         if self.process_integrity(int(new_change.split(' ')[-3]), change_num) != -1:
-            self.changes[change_num]=self.changes[change_num].replace(self.changes[change_num].split(' ')[-3], new_change.split(' ')[-3])
+            self.changes[change_num] = new_change
             self.update_file()
             print("..! 수정 성공")
 
@@ -2036,9 +2024,7 @@ class SearchResult:
                     print("..! 작업 실패: 음수 잔고 발생")
                     return -1  # 잔고 음수 발생
                 balances.append(str(new_balance))
-        i=0
-        for i in range(len(self.changes)):
-            change=self.changes[i]
+        for i, change in enumerate(self.changes):
             if i >= index:
                 balance = change.split(' ')[-1]
                 self.changes[i] = change.replace(balance, balances[i - index] + '\n')

@@ -5,11 +5,8 @@ import fileinput
 import sys
 import os
 
-#ACCOUNT_PATH = "C:/Users/thekoo/Documents/GitHub/Account/771137.txt"
-
-user_file = os.path.expanduser('~') + "\\Account-data" + "\\User" + "\\users.txt"
-account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
-
+#ACCOUNT_PATH = "C:/Users/thekoo/Documents/GitHub/Account/394028.txt"
+account_folder = "C:/Users/thekoo/Documents/GitHub/Account/code"
 
 tags = dict()
 main_tag = []
@@ -41,9 +38,6 @@ class CLIController:
             s += 1
             
 class ChangeBuilder:
-    
-    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
-    
     input_tag = ''
     input_money = ''
     input_date = ''
@@ -64,7 +58,7 @@ class ChangeBuilder:
             
             if any(x.isalpha() for x in t): #숫자와 문자 혼합
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag('771137'))
+                cli.printAllTag(ac.getAllTag('394028'))
                 return
             
             if t.count('.') >= 2:
@@ -95,11 +89,11 @@ class ChangeBuilder:
 
                     else:
                         print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                        cli.printAllTag(ac.getAllTag('771137'))
+                        cli.printAllTag(ac.getAllTag('394028'))
                         return
             else:
                 print("..! 존재하지 않는 태그 위치입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag('771137'))
+                cli.printAllTag(ac.getAllTag('394028'))
                 return
                 
         else: #입력이 문자
@@ -126,7 +120,7 @@ class ChangeBuilder:
                 return 
             elif not t in sum(sub_tag, []):
                 print("..! 존재하지 않는 태그입니다. 태그 추가 및 관리는 메인 메뉴에서 tag, t, [ 로 열 수 있습니다.")
-                cli.printAllTag(ac.getAllTag('771137'))
+                cli.printAllTag(ac.getAllTag('394028'))
                 return
             else:
                 #print("정상 입력 태그: {}" .format(t)) #확인용 지우기
@@ -142,18 +136,23 @@ class ChangeBuilder:
         
         self.input_money = srh_m
         srh_d = srh_date
-       
+        
         i = 0
-        file_name = self.account_folder + "\\" + self.ac_num + ".txt"
+    
+        
+        file_name = self.ac_num + ".txt"
         self.account_file = file_name
         f_s = open(file_name, 'r')
         lines = f_s.readlines()
         
         f_s.close()
+        
+        
         days = [] #내역에서 날짜만 뽑은거
         for l in lines[4:]:
             p = l.split(' ')[-2]
             days.append(p)
+            
         
         i = 4
         change_content = lines[int(i):]
@@ -176,7 +175,8 @@ class ChangeBuilder:
                     res = list(map(lambda x, y: x+' '+str(y), tmp[index:], c_tmp))
                     self.change_content = res
                     return index+4
-
+                
+        
         calc = int(self.total) + int(srh_m)
         if  calc < 0:
             return 'e'
@@ -193,39 +193,39 @@ class ChangeBuilder:
         head = ['-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         mids = [',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         tail  = ['원', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
+        
+        
         if len(mo) == 1 and not mo[0] in digits:
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
-            print("문자열 길이가 1이라면 그 문자는 무조건 숫자여야 함") #목업 따로 없어서 추가했습니다.
+            print(".!! 문자열 길이가 1이라면 그 문자는 무조건 숫자여야 합니다.") #목업 따로 없어서 추가했습니다.
             #print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
             return 'e'
-        elif len(mo) == 1:
-            return mo
+        elif len(mo) != 1:
         
-        if not mo[0] in head: #숫자 맨 앞은 숫자랑 + -로만 가능"
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
-            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
-            return 'e'
-        
-        for k in mo[1:-1]:
-            flag = False
-            for mid in mids:
-                if mid in k:
-                    flag = True
-                
-            if flag == False:
+            if not mo[0] in head: #숫자 맨 앞은 숫자랑 + -로만 가능"
                 print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
                 print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
                 return 'e'
-    
-        if not mo[-1] in tail: #숫자 끝은 원이랑 숫자만 가능
-            print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
-            print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
-            return 'e'
+            
+            for k in mo[1:-1]:
+                flag = False
+                for mid in mids:
+                    if mid in k:
+                        flag = True
+                    
+                if flag == False:
+                    print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                    print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+                    return 'e'
+        
+            if not mo[-1] in tail: #숫자 끝은 원이랑 숫자만 가능
+                print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
+                print("금액은 ‘,’, ‘원’, 숫자로만 써주세요.")
+                return 'e'
         
         if date != ():
             da = date[0]
-            print("확인", da)
+            #print("확인", da)
             res_d = self.setDate(da)
             if res_d != 'e': #숫자 입력 규칙 만족!
                 print("금액 비교하러 출동")
@@ -240,6 +240,7 @@ class ChangeBuilder:
             else:
                 return 'e'
         else:
+            
             res_d = datetime.today().strftime("%Y.%m.%d")
             self.input_date = res_d
             s = self.search(res_d, mo)
@@ -253,7 +254,8 @@ class ChangeBuilder:
     def setDate(self, date):
         d = date
         num = re.findall("\d+", d)
-
+    
+        
         if '.' in d and (d.count('-') != 0 or d.count('/')):
             print(".!! 오류: 금액, 날짜 순서로 입력해 주세요. 날짜만 생략할 수 있습니다.")
             print("날짜는 ‘-’, ‘/’, ‘.’를 하나 이하 포함하며 숫자로만 써주세요.") #이게 조금 더 명확한 것 같음?
@@ -298,7 +300,8 @@ class ChangeBuilder:
         num = list(map(int, num))
         check = ['-', '/', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         #print(num)
-
+        
+        
         for k in d:
             flag = False
             for ch in check:
@@ -337,12 +340,13 @@ class ChangeBuilder:
         
         money = self.input_money
         
-        print(money)
+        print("왜 여기는 출력 안해?", money)
         
         if '+' not in money and '-' not in money:
             money = '+' + money
             self.input_money = money
         
+        print("변환값", self.input_money)
         save_date = self.input_date
         save_total = self.new_total
         
@@ -358,7 +362,7 @@ class ChangeBuilder:
         else:
             self.input_tag = save_tag
             
-            file_name = self.account_folder + account_num + ".txt" #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
+            file_name = 'tmp_change' + '.txt' #파일 확정되지 않아 이름 한줄로 바꿔 해보았습니다.
             #file_name = account_num + ".txt"
             self.account_file = file_name
             f = open(file_name, 'r+')
@@ -389,8 +393,8 @@ class ChangeBuilder:
         d = ''
         
         self.ac_num = account_num
-
-        file_name = self.account_folder + "\\" +  account_num + ".txt"
+        
+        file_name = account_num + ".txt"
         self.account_file = file_name
         f = open(file_name, 'r')
         lines = f.readlines()
@@ -398,7 +402,8 @@ class ChangeBuilder:
         
         f.close()
         
-        
+        print("at", at, type(at))
+        print("atag", atag, type(atag))
         if type(atag) == list:
                 try:
                     m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> " .format(main_tag[at[0]-1], sub_tag[at[0]-1][at[1]-1])).split( ))
@@ -429,6 +434,7 @@ class ChangeBuilder:
             #print("d형태", d[0])
             if len(d) == 0:    
                 m_res = self.setMoney(m)
+                
             else:
                 m_res = self.setMoney(m, d[0])
             
@@ -438,7 +444,6 @@ class ChangeBuilder:
                     return 'e'
                 else:
                     return 'e'
-                
                 """    
                 if d:
                     for k in d:
@@ -461,18 +466,18 @@ class ChangeBuilder:
         
 
 class Account:
-    account_folder = os.path.expanduser('~') + "\\Account-data" + "\\Account"
+    account_folder = "C:\\Users\\thekoo\\Documents\\GitHub\\Account\\code"
     
     def getAllTag(self, account_num):
 
         tagDict = {}
-        file_name = self.account_folder + "\\" +account_num + ".txt"
+        file_name = self.account_folder + "\\" + account_num + ".txt"
         self.account_file = file_name
         file = open(file_name, 'r')
 
-        for i in range(3): #파일 형식 이름 한줄로 바꿔서 값 바뀐 부분1
+        for i in range(2): #파일 형식 이름 한줄로 바꿔서 값 바뀐 부분1
             file.readline()
-            if i == 2: #바뀐 부분2
+            if i == 1: #바뀐 부분2
                 l = file.readline()
         file.close()
         sl = l.split(" ")
@@ -484,11 +489,14 @@ class Account:
                     temp.append(tags[i])
             tagDict[tags[0]] = temp
         return tagDict
+    
+    
+      
         
 if __name__ == '__main__':
     ch = ChangeBuilder()
     ac = Account()
-    tags = ac.getAllTag('771137')
+    tags = ac.getAllTag('394028')
     main_tag = list(tags.keys())
     sub_tag = list(tags.values())
 
@@ -499,13 +507,13 @@ if __name__ == '__main__':
         if t == []:
             print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
             print("")
-            CLIController.printAllTag(ac.getAllTag('771137'))
+            CLIController.printAllTag(ac.getAllTag('394028'))
         else:
             tmp = ' '.join(t)
             tmp = tmp.strip()
             at = ch.setTag(tmp)
             if at != None:
-                add_res = ch.addChange('771137', at)
+                add_res = ch.addChange('394028', at)
                 if add_res == 'back':
                     print("주프롬프트 출력")
     
