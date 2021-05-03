@@ -1056,7 +1056,7 @@ class Account:
         print(f"=> 사용자 이름 : {self.user}")
         print(f"=> 변경 권한 : {perm_string}")
 
-        re = input("정말 저장하시겠습니까?>(.../No)")
+        re = input("정말 저장하시겠습니까? (.../No) > ")
         if re == 'No' or re == 'N' or re == 'n' or re == 'no':
             return
         else:
@@ -1584,7 +1584,7 @@ class ChangeBuilder:
             money = '+' + money
             self.input_money = money
             
-        print(f"{self.input_money}")
+        #print(f"{self.input_money}")
         save_date = self.input_date
         save_total = self.new_total
 
@@ -1597,7 +1597,7 @@ class ChangeBuilder:
             print(f"입력 내용: {save_tag} {money}원 {save_date} (오늘)")
             self.flag = True
 
-        save_check = input("AccountNumber> 정말 저장하시겠습니까? (.../No) >")
+        save_check = input("AccountNumber > 정말 저장하시겠습니까? (.../No) >")
 
         if save_check == "No":
             return 'back'
@@ -1636,12 +1636,9 @@ class ChangeBuilder:
     def addChange(self, account_num, atag):
         
         ac = Account(account_num, ID)
-        
-             
         t = ''
         m = ''
         d = ''
-
         self.ac_num = account_num
         main_tag = self.main_tag
 
@@ -1650,10 +1647,8 @@ class ChangeBuilder:
         f = open(file_name, 'r')
         lines = f.readlines()
         self.total = lines[-1].split(' ')[-1]
-
         at = atag
         f.close()
-
         if type(atag) == list:
             try:
                 m, *d = map(str, input("AccountNumber > [{0}][{1}] 내역> ".format(self.main_tag[at[0] - 1],
@@ -1773,12 +1768,11 @@ class SearchResult:
         search_list = self.make_search_list(search)
         if search_list is not None:
             match_list = self.search_change(search_list)
-            if len(match_list) == 0:
-                print("검색결과가 없습니다.")
-            elif self.usertype == 1 or self.usertype == 2:
+            self.print_match_list(match_list)
+            if self.usertype == '1' or self.usertype == '2':
                 select_change = self.select_change(match_list)
                 if select_change is not None:
-                    self.after_find_menu(select_change)
+                    self.select_edit_or_delete(select_change)
         else:
             #print("주프롬프트로 돌아감")
             return
@@ -1868,7 +1862,6 @@ class SearchResult:
         if len(search_date_list) != 0:
             search_date_list[0]=search_date_list[0][:-1]
 
-
         if len(search_date_list) == 1:
             for k in search_date_list:
                 for i, v in enumerate(self.changes):
@@ -1906,17 +1899,21 @@ class SearchResult:
         else:
             match_set = (date_match_set | tag_match_set)
         match_list = sorted(match_set)
+        return match_list  # 파일에서 각 change의 줄(line) 수만 저장해 반환
+
+    def print_match_list(self, match_list):
+        if len(match_list) == 0:
+            print("검색결과가 없습니다.")
         j = 1
         for i in match_list:
             print(j, " ".join(self.changes[i].split()[:-1]))
             j += 1
         print()
-        return match_list  # 파일에서 각 change의 줄(line) 수만 저장해 반환
 
     def select_change(self, match_list):
         while True:
             try:
-                select = int(input("AccountNum> 내역 선택(취소는 0)> "))
+                select = int(input("AccountNumber > 내역 선택(취소는 0) > "))
             except:
                 print("..! 존재하지 않는 번호입니다. 범위 내의 정수만 입력할 수 있습니다.")
                 continue
@@ -1927,7 +1924,7 @@ class SearchResult:
             else:
                 print("..! 존재하지 않는 번호입니다. 범위 내의 정수만 입력할 수 있습니다.")
 
-    def after_find_menu(self, selected_change_num):
+    def select_edit_or_delete(self, selected_change_num):
         print("선택된 내역: ", " ".join(self.changes[selected_change_num].split()[:-1]))
         print("..! 원하시는 기능을 입력하세요(숫자 하나)")
         print("1.내역 수정    2. 내역 삭제     3. 취소")
@@ -1957,9 +1954,14 @@ class SearchResult:
         return
 
     def edit_change(self, change_num):
+        change=self.changes[change_num]
+        tag = ' '.join(change.split()[:-3])
+        money = ' '.join(change.split()[-3:-2])
+        date = ' '.join(change.split()[-2:-1])
+        balance = ' '.join(change.split()[-1:])
         while True:
             try:
-                c, *t = input("\nAccountNumber> 내역 수정> ").split()
+                c, *t = input("\nAccountNumber > 내역 수정 > ").split()
             except:
                 print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
                 print("입력 예시) tag [카페]")
@@ -1974,72 +1976,96 @@ class SearchResult:
                 change_builder.sub_tag = list(change_builder.tags.values())
                 if len(t) == 0:
                     print(".!! 오류: 추가 명령어 뒤에 하나의 [태그]나 태그 위치를 입력해야 합니다.")
-                    print("")
                     CLIController.printAllTag(a.getAllTag(self.account_num))
-                    return
+                    continue
                 t = ' '.join(t)
-                tag = change_builder.setTag(t)
-
-                print(tag)
-                if tag != 'e':
+                new_tag = change_builder.setTag(t)
+                if new_tag != 'e':
                     index = 0
                     for ind, st in enumerate(change_builder.sub_tag):
-                        if tag in st:
+                        if new_tag in st:
                             index = ind
                             break
                     mtag = change_builder.main_tag[index]
 
-                    if type(tag) == list:
-                        tag = '[' + change_builder.main_tag[tag[0] - 1] + ']' + '[' + \
-                              change_builder.sub_tag[tag[0] - 1][tag[1] - 1] + ']'
-                        new_change = self.changes[change_num].replace(self.changes[change_num].split()[-4:-3][0],
-                                                                      tag)  # tag 넣은 새 내역 문자열
-                    elif type(tag) == str:
-                        tag = '[' + mtag +']' + '[' + tag +']'
-                        new_change = self.changes[change_num].replace(self.changes[change_num].split()[-4:-3][0],
-                                                                      tag)  # tag 넣은 새 내역 문자열
-                    break
-            elif c == 'date':
-                date = change_builder.setDate(t)
-                print(date)
-                if date != 'e':
-                    new_change = self.changes[change_num].replace(self.changes[change_num].split()[-2:-1][0],
-                                                                  date)  # date 넣은 새 내역 문자열
-                    print(new_change)
-                    break
+                    if type(new_tag) == list:
+                        new_tag = '[' + change_builder.main_tag[new_tag[0] - 1] + ']' + '[' + \
+                              change_builder.sub_tag[new_tag[0] - 1][new_tag[1] - 1] + ']'
+                    elif type(new_tag) == str:
+                        new_tag = '[' + mtag + ']' + '[' + new_tag + ']'
+                    new_change = f"{new_tag} {money} {date} {balance}\n"
+                    print("수정된 내역: ", " ".join(new_change.split()[:-1]))
+                    confirm = input("AccountNumber > 정말 수정하시겠습니까? (.../No) > ")
+                    if confirm == "No":
+                        return
+
+                    self.changes[change_num] = new_change
+                    self.update_file()
+                    print("..! 수정 성공")
+                    return
+
             elif c == 'money':
-                money = change_builder.setMoney(t)
-                if money != 'e':
-                    new_change = self.changes[change_num].replace(self.changes[change_num].split()[-3:-2][0],
-                                                                  money)  # money 넣은 새 내역 문자열
-                    break
+                new_money = change_builder.setMoney(t)
+                new_balance = str(int(balance) - int(money) + int(new_money))
+                if new_money != 'e':
+                    new_change = f"{tag} {new_money} {date} {new_balance}\n"
+                print("수정된 내역: ", " ".join(new_change.split()[:-1]))
+                confirm = input("AccountNumber > 정말 수정하시겠습니까? (.../No) > ")
+                if confirm == "No":
+                    return
+                if self.process_integrity(int(money), int(new_money), change_num) != -1:
+                    self.changes[change_num]=new_change
+                    self.update_file()
+                    print("..! 수정 성공")
+                    return
+
+            elif c == 'date':
+                new_date = change_builder.setDate(t)
+                if new_date != 'e':
+                    changes_backup = self.changes.copy()
+                    if self.process_integrity(int(money), 0, change_num) != -1:
+                        del self.changes[change_num]
+                        if self.insert_change_list(tag, money, new_date) != -1:
+                            self.update_file()
+                            print("..! 수정 성공")
+                            return
+                        else:
+                            self.changes=changes_backup
             else:
                 print("..! 수정하고 싶은 항목에 따라 tag, date, money와 수정할 내용을 입력하세요.")
                 print("입력 예시) tag [카페]")
                 print("          date 2021.01.02")
                 print("          moeny -1000원")
 
-        # new_change = "[음식][식사] -2000 2021.01.25 13000\n" #임시 테스트용(new_change생성 전 수정기능 테스트)
-        print("수정된 내역: ", " ".join(new_change.split()[:-1]))
-        confirm = input("AccountNumber> 정말 수정하시겠습니까? (.../No) > ")
-        if confirm == "No":
-            return
-
-        if self.process_integrity(int(new_change.split(' ')[-3]), change_num) != -1:
-            self.changes[change_num]=self.changes[change_num].replace(self.changes[change_num].split(' ')[-3], new_change.split(' ')[-3])
-            self.update_file()
-            print("..! 수정 성공")
-
     def delete_change(self, change_num):
-        if self.process_integrity(0, change_num) != -1:
+        old_money = int(self.changes[change_num].split(' ')[-3])
+        if self.process_integrity(old_money, 0, change_num) != -1:
             del self.changes[change_num]
             self.update_file()
             print("..! 삭제 성공")
             # 무결성 처리 진행 후 종료
 
-    def process_integrity(self, new_money, index):
+    def insert_change_list(self, insert_tag, insert_money, insert_date):
+        insert_index = 0
+        for i, day in enumerate(self.days):
+            if insert_date < day:
+                insert_index = i
+                new_balance = int(self.changes[insert_index - 1].split(' ')[-1]) + int(insert_money)
+                break
+        if insert_index == 0:
+            new_balance = int(insert_money)
+        if new_balance < 0:
+            print("..! 작업 실패: 음수 잔고 발생")
+            return -1  # 잔고 음수 발생
+        if self.process_integrity(0, int(insert_money), insert_index) != -1:
+            new_change = f"{insert_tag} {insert_money} {insert_date} {new_balance}\n"
+            self.changes.insert(insert_index, new_change)
+        else:
+            return -1
+
+    def process_integrity(self, old_money, new_money, index):
         balances = []
-        gap = int(self.changes[index].split(' ')[-3]) - new_money
+        gap = old_money - new_money
         for i, change in enumerate(self.changes):
             if i >= index:
                 balance = change.split(' ')[-1]
@@ -2048,9 +2074,8 @@ class SearchResult:
                     print("..! 작업 실패: 음수 잔고 발생")
                     return -1  # 잔고 음수 발생
                 balances.append(str(new_balance))
-        i=0
-        for i in range(len(self.changes)):
-            change=self.changes[i]
+
+        for i, change in enumerate(self.changes):
             if i >= index:
                 balance = change.split(' ')[-1]
                 self.changes[i] = change.replace(balance, balances[i - index] + '\n')
