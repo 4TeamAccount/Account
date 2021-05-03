@@ -195,8 +195,8 @@ class CLIController:
                 except:
                     CLIController.printCommend()
                     continue
-                if select_num == 2:
-                    print("검색 및 수정부입니다")
+                if select_num == "2" or select_num == 'find' or select_num == 'f' or select_num == '/':
+                    SearchResult(account_num, ID, t)
                 elif select_num == "5" or select_num == 'manage' or select_num == 'm' or select_num == '>':
                     if t == []:
                         break
@@ -742,7 +742,6 @@ class Account:
         self.account_file = file_name
         file = open(file_name, 'r')
         string = file.readlines()
-        
 
         userline = string[1]
         userList = userline.split("\t")
@@ -1000,7 +999,7 @@ class Account:
         file.close()
         userList = l.split('\t')  # 이거 탭으로 바꿔야
         userIdList = list(map(lambda x: x[:-1].split('('), userList))
-        print(userIdList)
+        #print(userIdList)
         return userIdList
 
     # 목록에 입력한 사용자가 있으면 True 없으면 False
@@ -1752,10 +1751,14 @@ class SearchResult:
         self.filepath = self.account_folder + "\\" + self.account_num + ".txt"
         self.file = open(self.filepath, 'r', encoding='ANSI')
         self.backup = []
+
+        a = Account(account_num, userid)
+        self.usertype = a.userTypeCheck(account_num, userid)
+
         for i in range(5):
             l = self.file.readline()
-            if i == 2:
-                self.usertype = 2  # l에서 아이디 찾아서 권한 넣는 함수 넣기(주프롬프트에서 사용한거 그대로 넣으면 될것같아요!)
+            #if i == 2:
+            #    self.usertype = 2  # l에서 아이디 찾아서 권한 넣는 함수 넣기(주프롬프트에서 사용한거 그대로 넣으면 될것같아요!)
             self.backup.append(l)
             if i == 4:
                 self.changes = self.file.readlines()  # 내역들을 저장한 리스트
