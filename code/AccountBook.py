@@ -474,8 +474,9 @@ class UserManager:
                             or re.fullmatch(UserManager.ID_match4, ID) or re.fullmatch(UserManager.ID_match5, ID)
                             or re.fullmatch(UserManager.ID_match6, ID) or re.fullmatch(UserManager.ID_match7, ID)):
                         r2 = False
-                    if not ID[0] not in ['-', '_']:
-                        r3 = False
+                    if len(ID) >= 1:
+                        if not ID[0] not in ['-', '_']:
+                            r3 = False
 
                     # 문법 규칙 틀렸을 경우 안내
                     if not (r1 == True and r2 == True and r3 == True):
@@ -680,9 +681,10 @@ class FileManager:
             string = file.readline()
             list = string.split(" ")
             balance = list[len(list) - 1]
-            if not balance.find("-") == -1:
-                check = 0
-                break
+            if len(balance) >= 1 and balance[0] == '[':
+                if not balance.find("-") == -1:
+                    check = 0
+                    break
         file.close()
         return check
 
@@ -748,7 +750,7 @@ class Account:
         file.close()
         
         for user in userList:
-            if user.split("(")[1].replace(")", "").replace("\n", "") == ID:
+            if user.split("(")[-1].replace(")", "").replace("\n", "") == ID:
                 return user[0]
                 break
 
@@ -998,7 +1000,7 @@ class Account:
         l = file.readline()[:-1]
         file.close()
         userList = l.split('\t')  # 이거 탭으로 바꿔야
-        userIdList = list(map(lambda x: x[:-1].split('('), userList))
+        userIdList = list(map(lambda x: x[:-1].rsplit('(', 1), userList))
         #print(userIdList)
         return userIdList
 
